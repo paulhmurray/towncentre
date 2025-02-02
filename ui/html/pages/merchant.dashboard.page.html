@@ -1,0 +1,383 @@
+{{define "title"}}Merchant Dashboard - TownCentre{{end}} {{define "main"}}
+<div class="min-h-screen bg-gray-50">
+  <!-- Top Stats Section -->
+  <div class="bg-white shadow">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+      <!-- Total Products -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  Total Products
+                </dt>
+                <dd class="flex items-baseline">
+                  <div class="text-2xl font-semibold text-gray-900">12</div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Views -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  Total Views
+                </dt>
+                <dd class="flex items-baseline">
+                  <div class="text-2xl font-semibold text-gray-900">245</div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inquiries -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  New Inquiries
+                </dt>
+                <dd class="flex items-baseline">
+                  <div class="text-2xl font-semibold text-gray-900">3</div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Sales -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">
+                  Total Sales
+                </dt>
+                <dd class="flex items-baseline">
+                  <div class="text-2xl font-semibold text-gray-900">$1,235</div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions and Recent Activity -->
+    <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <!-- Quick Actions -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-6">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <a
+              href="/merchant/product/create"
+              class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              Add New Product
+            </a>
+            <a
+              href="/merchant/orders"
+              class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              View Orders
+            </a>
+            <a
+              href="/merchant/messages"
+              class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              Messages
+            </a>
+            <a
+              href="/merchant/settings"
+              class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            >
+              Settings
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-6">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">
+            Recent Activity
+          </h2>
+          <div class="flow-root">
+            <ul class="-mb-8">
+              <li>
+                <div class="relative pb-8">
+                  <div class="relative flex space-x-3">
+                    <div>
+                      <span
+                        class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white"
+                      >
+                        <svg
+                          class="h-5 w-5 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                      </span>
+                    </div>
+                    <div
+                      class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4"
+                    >
+                      <div>
+                        <p class="text-sm text-gray-500">
+                          New product
+                          <span class="font-medium text-gray-900"
+                            >Handmade Soap</span
+                          >
+                          added
+                        </p>
+                      </div>
+                      <div
+                        class="text-right text-sm whitespace-nowrap text-gray-500"
+                      >
+                        <time datetime="2025-01-29">2h ago</time>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <!-- Add more activity items as needed -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products List -->
+    <div class="mt-8 bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-medium text-gray-900">Your Products</h2>
+          <a
+            href="/merchant/product/create"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            Add Product
+          </a>
+        </div>
+
+        {{if .Products}}
+        <div class="flow-root">
+          <ul role="list" class="divide-y divide-gray-200">
+            {{range .Products}}
+            <li class="py-5">
+              <div class="flex flex-col sm:flex-row">
+                <!-- Image and Basic Info -->
+                <div class="flex-shrink-0 flex items-start">
+                  {{if .ThumbnailPath}}
+                  <img
+                    class="h-20 w-20 rounded-lg object-cover"
+                    src="{{.ThumbnailPath}}"
+                    alt="{{.Name}}"
+                  />
+                  {{else if .ImagePath}}
+                  <img
+                    class="h-20 w-20 rounded-lg object-cover"
+                    src="{{.ImagePath}}"
+                    alt="{{.Name}}"
+                  />
+                  {{else}}
+                  <img
+                    class="h-20 w-20 rounded-lg object-cover bg-gray-100"
+                    src="/api/placeholder/80/80"
+                    alt="No image"
+                  />
+                  {{end}}
+                </div>
+                <!-- Product Details -->
+                <div class="ml-4 flex-1 flex flex-col">
+                  <div>
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <h3 class="text-base font-medium text-gray-900">
+                          {{.Name}}
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500 line-clamp-2">
+                          {{.Description}}
+                        </p>
+                      </div>
+                      <div class="ml-4 flex-shrink-0">
+                        <span class="text-base font-medium text-gray-900"
+                          >${{printf "%.2f" .Price}}</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Additional Info and Actions -->
+                  <div class="mt-4 flex items-center justify-between">
+                    <div class="flex space-x-4">
+                      {{if .HasDelivery}}
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                      >
+                        Delivery
+                      </span>
+                      {{end}} {{if .HasPickup}}
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                      >
+                        Pickup
+                      </span>
+                      {{end}}
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                      >
+                        {{.Category}}
+                      </span>
+                    </div>
+                    <div class="flex space-x-4">
+                      <a
+                        href="/merchant/product/edit/{{.ID}}"
+                        class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                      >
+                        Edit
+                      </a>
+                      <button
+                        hx-delete="/merchant/product/delete/{{.ID}}"
+                        hx-confirm="Are you sure you want to delete this product?"
+                        class="text-sm font-medium text-red-600 hover:text-red-500"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            {{end}}
+          </ul>
+        </div>
+        {{else}}
+        <!-- Empty State -->
+        <div class="text-center py-12">
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No products</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            Get started by creating a new product.
+          </p>
+          <div class="mt-6">
+            <a
+              href="/merchant/product/create"
+              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              <svg
+                class="mr-2 -ml-1 h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Add Product
+            </a>
+          </div>
+        </div>
+        {{end}}
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}

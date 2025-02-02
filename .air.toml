@@ -1,0 +1,27 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/main ./cmd/web"
+bin = "tmp/main"
+full_bin = "tmp/main"
+include_ext = ["go", "html"]
+exclude_dir = ["tmp", "vendor"]
+include_dir = []
+exclude_file = []
+delay = 1000
+stop_on_error = true
+log = "air.log"
+send_interrupt = false
+
+[log]
+time = true
+
+[color]
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[misc]
+clean_on_exit = true
