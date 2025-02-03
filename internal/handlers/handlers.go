@@ -32,6 +32,8 @@ type templateData struct {
 	IsAuthenticated bool
 	Merchant        *models.Merchant
 	Products        []*models.Product
+	Product         *models.Product
+	Store           *models.Merchant
 }
 
 // Home handler
@@ -72,8 +74,30 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 	// Parse multipart form for file upload (5MB max)
 	r.ParseMultipartForm(5 << 20)
 
-	// Initialize variables for image paths
-	var imagePath, thumbnailPath string
+	// Parse form data first
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// Parse the price
+	price, err := strconv.ParseFloat(r.PostForm.Get("price"), 64)
+	if err != nil {
+		http.Error(w, "Invalid price", http.StatusBadRequest)
+		return
+	}
+
+	// Create product struct early
+	product := &models.Product{
+		MerchantID:  merchantID,
+		Name:        r.PostForm.Get("name"),
+		Description: r.PostForm.Get("description"),
+		Price:       price,
+		Category:    r.PostForm.Get("category"),
+		HasDelivery: r.PostForm.Get("delivery") == "on",
+		HasPickup:   r.PostForm.Get("pickup") == "on",
+	}
 
 	// Handle file upload
 	if file, header, err := r.FormFile("image"); err == nil {
@@ -83,7 +107,10 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 		ext := filepath.Ext(header.Filename)
 		filename := fmt.Sprintf("%d-%s%s", time.Now().UnixNano(), uuid.New().String(), ext)
 		fullPath := filepath.Join("ui/static/images/products", filename)
-		imagePath = filepath.Join("/static/images/products", filename)
+		webPath := "/static/images/products/" + filename
+
+		log.Printf("Full path: %s", fullPath)
+		log.Printf("Web path: %s", webPath)
 
 		// Create the file
 		dst, err := os.Create(fullPath)
@@ -101,41 +128,23 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 			return
 		}
 
+		// Set the main image path
+		imagePath := webPath
+		product.ImagePath = &imagePath
+
 		// Create thumbnail
 		if thumbPath, err := createThumbnail(fullPath); err == nil {
-			thumbnailPath = strings.Replace(thumbPath, "ui/static", "", 1)
+			webThumbPath := "/static/images/products/" + filepath.Base(thumbPath)
+			thumbnailPath := webThumbPath
+			product.ThumbnailPath = &thumbnailPath
 		} else {
 			log.Printf("Error creating thumbnail: %v", err)
-			// Continue anyway, we'll use the original image if thumbnail creation fails
 		}
 	}
 
-	// Parse the form
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
-		return
-	}
-
-	// Parse the price
-	price, err := strconv.ParseFloat(r.PostForm.Get("price"), 64)
-	if err != nil {
-		http.Error(w, "Invalid price", http.StatusBadRequest)
-		return
-	}
-
-	// Create product
-	product := &models.Product{
-		MerchantID:    merchantID,
-		Name:          r.PostForm.Get("name"),
-		Description:   r.PostForm.Get("description"),
-		Price:         price,
-		Category:      r.PostForm.Get("category"),
-		ImagePath:     imagePath,
-		ThumbnailPath: thumbnailPath,
-		HasDelivery:   r.PostForm.Get("delivery") == "on", // Note: changed from has_delivery to match form
-		HasPickup:     r.PostForm.Get("pickup") == "on",   // Note: changed from has_pickup to match form
-	}
+	// Debug logging
+	//log.Printf("Product Image Path: %s", product.ImagePath)
+	//log.Printf("Product Thumbnail Path: %s", product.ThumbnailPath)
 
 	// Insert the product
 	err = app.Products.Insert(product)
@@ -163,6 +172,204 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 	}
 
 	// Regular form submission - redirect to dashboard
+	http.Redirect(w, r, "/merchant/dashboard", http.StatusSeeOther)
+}
+
+// MerchantProductEdit - shows the edit form
+func (app *Application) MerchantProductEdit(w http.ResponseWriter, r *http.Request) {
+	// Get the merchant ID from the session
+	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
+	if !ok {
+		log.Printf("No merchant ID in session")
+		http.Redirect(w, r, "/merchant/login", http.StatusSeeOther)
+		return
+	}
+
+	// Get the merchant data
+	merchant, err := app.Merchants.GetByID(merchantID)
+	if err != nil {
+		log.Printf("Error fetching merchant: %v", err)
+		http.Error(w, "Error fetching merchant data", http.StatusInternalServerError)
+		return
+	}
+
+	// Get the product ID from the URL
+	productIDStr := r.PathValue("id")
+	log.Printf("Attempting to edit product ID: %s", productIDStr)
+
+	productID, err := strconv.ParseInt(productIDStr, 10, 64)
+	if err != nil {
+		log.Printf("Invalid product ID: %v", err)
+		http.Error(w, "Invalid product ID", http.StatusBadRequest)
+		return
+	}
+
+	// Fetch the product
+	product, err := app.Products.GetByID(productID, merchantID)
+	if err != nil {
+		log.Printf("Error fetching product %d for merchant %d: %v", productID, merchantID, err)
+		http.Error(w, "Product not found", http.StatusNotFound)
+		return
+	}
+
+	// Add debug logging
+	log.Printf("Retrieved product: %+v", product)
+
+	// Render the edit form with both merchant and product data
+	data := &templateData{
+		IsAuthenticated: true,
+		Merchant:        merchant,
+		Product:         product,
+	}
+
+	log.Printf("Rendering edit form with data: %+v", data)
+	app.render(w, r, http.StatusOK, "merchant.product.edit.page.html", data)
+}
+
+// MerchantProductEditPost - processes the edit form submission
+func (app *Application) MerchantProductEditPost(w http.ResponseWriter, r *http.Request) {
+	// Get the merchant ID from the session
+	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Get the product ID from the URL
+	productIDStr := r.PathValue("id")
+	productID, err := strconv.ParseInt(productIDStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid product ID", http.StatusBadRequest)
+		return
+	}
+
+	// Parse form data
+	err = r.ParseMultipartForm(5 << 20) // 5MB max
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// Parse the price
+	price, err := strconv.ParseFloat(r.PostForm.Get("price"), 64)
+	if err != nil {
+		http.Error(w, "Invalid price", http.StatusBadRequest)
+		return
+	}
+
+	// First get the existing product
+	existingProduct, err := app.Products.GetByID(productID, merchantID)
+	if err != nil {
+		log.Printf("Error fetching existing product: %v", err)
+		http.Error(w, "Product not found", http.StatusNotFound)
+		return
+	}
+
+	// Create product struct with existing image paths
+	product := &models.Product{
+		ID:            productID,
+		MerchantID:    merchantID,
+		Name:          r.PostForm.Get("name"),
+		Description:   r.PostForm.Get("description"),
+		Price:         price,
+		Category:      r.PostForm.Get("category"),
+		HasDelivery:   r.PostForm.Get("delivery") == "on",
+		HasPickup:     r.PostForm.Get("pickup") == "on",
+		ImagePath:     existingProduct.ImagePath,     // Keep existing image path
+		ThumbnailPath: existingProduct.ThumbnailPath, // Keep existing thumbnail path
+	}
+
+	// Handle file upload (optional)
+	if file, header, err := r.FormFile("image"); err == nil {
+		defer file.Close()
+
+		// Create unique filename
+		ext := filepath.Ext(header.Filename)
+		filename := fmt.Sprintf("%d-%s%s", time.Now().UnixNano(), uuid.New().String(), ext)
+		fullPath := filepath.Join("ui/static/images/products", filename)
+		webPath := "/static/images/products/" + filename
+
+		// Create the file
+		dst, err := os.Create(fullPath)
+		if err != nil {
+			log.Printf("Error creating file: %v", err)
+			http.Error(w, "Error uploading file", http.StatusInternalServerError)
+			return
+		}
+		defer dst.Close()
+
+		// Copy the uploaded file
+		if _, err := io.Copy(dst, file); err != nil {
+			log.Printf("Error copying file: %v", err)
+			http.Error(w, "Error uploading file", http.StatusInternalServerError)
+			return
+		}
+
+		// Set the main image path
+		imagePath := webPath
+		product.ImagePath = &imagePath
+
+		// Create thumbnail
+		if thumbPath, err := createThumbnail(fullPath); err == nil {
+			webThumbPath := "/static/images/products/" + filepath.Base(thumbPath)
+			thumbnailPath := webThumbPath
+			product.ThumbnailPath = &thumbnailPath
+		} else {
+			log.Printf("Error creating thumbnail: %v", err)
+		}
+	}
+
+	// Update the product
+	err = app.Products.Update(product)
+	if err != nil {
+		log.Printf("Error updating product: %v", err)
+		http.Error(w, "Error updating product", http.StatusInternalServerError)
+		return
+	}
+
+	// For HTMX requests, use HX-Redirect header
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/merchant/dashboard")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	// Redirect for non-HTMX requests
+	http.Redirect(w, r, "/merchant/dashboard", http.StatusSeeOther)
+}
+
+func (app *Application) MerchantProductDelete(w http.ResponseWriter, r *http.Request) {
+	// Get the merchant ID from the session
+	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Get the product ID from the URL
+	productIDStr := r.PathValue("id")
+	productID, err := strconv.ParseInt(productIDStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid product ID", http.StatusBadRequest)
+		return
+	}
+
+	// Attempt to delete the product
+	err = app.Products.Delete(productID, merchantID)
+	if err != nil {
+		log.Printf("Error deleting product: %v", err)
+		http.Error(w, "Error deleting product", http.StatusInternalServerError)
+		return
+	}
+
+	// For HTMX requests, use HX-Redirect header
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/merchant/dashboard")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	// Redirect for non-HTMX requests
 	http.Redirect(w, r, "/merchant/dashboard", http.StatusSeeOther)
 }
 
@@ -366,21 +573,76 @@ func (app *Application) render(w http.ResponseWriter, r *http.Request, status in
 }
 
 func createThumbnail(originalPath string) (string, error) {
+	log.Printf("Starting thumbnail creation for: %s", originalPath)
+
+	// Check if file exists
+	if _, err := os.Stat(originalPath); os.IsNotExist(err) {
+		return "", fmt.Errorf("original file does not exist: %v", err)
+	}
+
 	// Open the original image
 	src, err := imaging.Open(originalPath)
 	if err != nil {
 		return "", fmt.Errorf("failed ot open image: %v", err)
 	}
+
+	log.Printf("Successfully opened image")
+
 	// Create thumbnail (resixe to width 200px while preserving aspect ratio)
 	thumbnail := imaging.Resize(src, 200, 0, imaging.Lanczos)
+
+	log.Printf("Successfully resized image")
 
 	// Create thumbnail filename
 	originalExt := filepath.Ext(originalPath)
 	thumbnailPath := strings.TrimSuffix(originalPath, originalExt) + "_thumb" + originalExt
 
+	log.Printf("Saving thumbnail to: %s", thumbnailPath)
+
 	err = imaging.Save(thumbnail, thumbnailPath)
 	if err != nil {
 		return "", fmt.Errorf("Failed to save thumbnail: %v", err)
 	}
+
+	log.Printf("Successfully saved thumbnail")
 	return thumbnailPath, nil
+}
+
+func (app *Application) StoreProfile(w http.ResponseWriter, r *http.Request) {
+	region := "ballarat" // Hardcoded for now
+	storeSlug := r.PathValue("slug")
+
+	if storeSlug == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Get merchant by store slug and region
+	merchant, err := app.Merchants.GetByStoreSlugAndRegion(storeSlug, region)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.NotFound(w, r)
+		} else {
+			log.Printf("Error fetching store: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Get all products for this merchant
+	products, err := app.Products.GetByMerchantID(merchant.ID)
+	if err != nil {
+		log.Printf("Error fetching products: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Prepare template data
+	data := &templateData{
+		Store:    merchant,
+		Products: products,
+	}
+
+	// Render the store profile template
+	app.render(w, r, http.StatusOK, "store.page.html", data)
 }

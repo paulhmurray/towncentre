@@ -117,6 +117,14 @@ func main() {
 	mux.Handle("POST /merchant/product/create", combinedMiddleware(app.MerchantProductCreatePost))
 	mux.Handle("GET /search", combinedMiddleware(app.Search))
 	mux.Handle("GET /category/{category}", combinedMiddleware(app.CategoryProducts))
+	mux.Handle("GET /merchant/product/edit/{id}", combinedMiddleware(app.MerchantProductEdit))
+	mux.Handle("POST /merchant/product/edit/{id}", combinedMiddleware(app.MerchantProductEditPost))
+	mux.Handle("DELETE /merchant/product/delete/{id}", combinedMiddleware(app.MerchantProductDelete))
+
+	// For now, just Ballarat
+	// In the future, this would become:
+	// mux.Handle("GET /{region}/{slug}", sessionManager.LoadAndSave(http.HandlerFunc(app.StoreProfile)))
+	mux.Handle("GET /ballarat/{slug}", combinedMiddleware(app.StoreProfile))
 
 	// Static file servers (no middleware needed)
 	mux.Handle("GET /assets/", http.StripPrefix("/assets", assetsServer))
