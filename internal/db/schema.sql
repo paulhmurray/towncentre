@@ -2,13 +2,22 @@
 CREATE TABLE IF NOT EXISTS merchants (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     business_name VARCHAR(255) NOT NULL,
+    store_name VARCHAR(255),
+    store_slug VARCHAR(255),
+    region VARCHAR(50),
+    description TEXT,
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(50),
     business_type VARCHAR(50) NOT NULL,
+    location VARCHAR(255),
+    opening_hours TEXT,
     password_hash BINARY(60) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Add an index for faster slug lookups
+CREATE INDEX IF NOT EXISTS idx_store_slug_region ON merchants(store_slug, region);
 
 CREATE TABLE IF NOT EXISTS sessions (
     token CHAR(43) PRIMARY KEY,

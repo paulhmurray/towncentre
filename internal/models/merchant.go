@@ -177,23 +177,62 @@ func generateSlug(name string) string {
 func (m *MerchantModel) GetByStoreSlugAndRegion(slug, region string) (*Merchant, error) {
 	stmt := `
         SELECT id, business_name, store_name, store_slug, region,
-               description, email, phone, business_type, location,
+               description, email, phone, business_type, location, 
                opening_hours, created_at, updated_at
         FROM merchants
         WHERE store_slug = ? AND region = ?`
 
 	merchant := &Merchant{}
 	err := m.DB.QueryRow(stmt, slug, region).Scan(
-		&merchant.ID, &merchant.BusinessName, &merchant.StoreName,
-		&merchant.StoreSlug, &merchant.Region, &merchant.Description,
-		&merchant.Email, &merchant.Phone, &merchant.BusinessType,
-		&merchant.Location, &merchant.OpeningHours,
-		&merchant.CreatedAt, &merchant.UpdatedAt,
+		&merchant.ID,
+		&merchant.BusinessName,
+		&merchant.StoreName,
+		&merchant.StoreSlug,
+		&merchant.Region,
+		&merchant.Description,
+		&merchant.Email,
+		&merchant.Phone,
+		&merchant.BusinessType,
+		&merchant.Location,
+		&merchant.OpeningHours,
+		&merchant.CreatedAt,
+		&merchant.UpdatedAt,
 	)
 
 	if err != nil {
-		return nil, err
+		if err == sql.ErrNoRows {
+			return nil, err
+		}
+		return nil, fmt.Errorf("error fetching merchant by slug: %v", err)
+	}
+
+	// If store_name is empty, use business_name
+	if merchant.StoreName == "" {
+		merchant.StoreName = merchant.BusinessName
 	}
 
 	return merchant, nil
+}
+func (m *MerchantModel) UpdateStoreInfo(merchant *Merchant) error {
+	stmt := `
+        UPDATE merchants 
+        SET store_name = ?,
+            description = ?,
+            location = ?,
+            opening_hours = ?,
+            updated_at = NOW()
+        WHERE id = ?`
+
+	_, err := m.DB.Exec(stmt,
+		merchant.StoreName,
+		merchant.Description,
+		merchant.Location,
+		merchant.OpeningHours,
+		merchant.ID)
+
+	if err != nil {
+		return fmt.Errorf("error updating merchant: %v", err)
+	}
+
+	return nil
 }

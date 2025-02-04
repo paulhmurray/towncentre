@@ -612,7 +612,10 @@ func (app *Application) StoreProfile(w http.ResponseWriter, r *http.Request) {
 	region := "ballarat" // Hardcoded for now
 	storeSlug := r.PathValue("slug")
 
+	log.Printf("Accessing store profile - Region: %s, Slug: %s", region, storeSlug)
+
 	if storeSlug == "" {
+		log.Printf("Store slug is empty")
 		http.NotFound(w, r)
 		return
 	}
@@ -621,6 +624,7 @@ func (app *Application) StoreProfile(w http.ResponseWriter, r *http.Request) {
 	merchant, err := app.Merchants.GetByStoreSlugAndRegion(storeSlug, region)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			log.Printf("No store found for slug '%s' in region '%s'", storeSlug, region)
 			http.NotFound(w, r)
 		} else {
 			log.Printf("Error fetching store: %v", err)
@@ -645,4 +649,82 @@ func (app *Application) StoreProfile(w http.ResponseWriter, r *http.Request) {
 
 	// Render the store profile template
 	app.render(w, r, http.StatusOK, "store.page.html", data)
+}
+
+// Add to handlers.go
+
+func (app *Application) StoreSettings(w http.ResponseWriter, r *http.Request) {
+	// Get the merchant ID from the session
+	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
+	if !ok {
+		http.Redirect(w, r, "/merchant/login", http.StatusSeeOther)
+		return
+	}
+
+	// Get merchant data
+	merchant, err := app.Merchants.GetByID(merchantID)
+	if err != nil {
+		log.Printf("Error fetching merchant: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	data := &templateData{
+		IsAuthenticated: true,
+		Merchant:        merchant,
+	}
+
+	app.render(w, r, http.StatusOK, "merchant.settings.page.html", data)
+}
+
+func (app *Application) StoreSettingsPost(w http.ResponseWriter, r *http.Request) {
+	// Get the merchant ID from the session
+	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		log.Printf("Error parsing form: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// Create updated merchant data
+	merchant := &models.Merchant{
+		ID:           merchantID,
+		StoreName:    r.PostForm.Get("store-name"),
+		Description:  r.PostForm.Get("description"),
+		Location:     r.PostForm.Get("location"),
+		OpeningHours: r.PostForm.Get("opening-hours"),
+	}
+
+	// Update the merchant
+	err = app.Merchants.UpdateStoreInfo(merchant)
+	if err != nil {
+		log.Printf("Error updating merchant: %v", err)
+		http.Error(w, "Error updating store information", http.StatusInternalServerError)
+		return
+	}
+
+	// Handle HTMX request
+	if r.Header.Get("HX-Request") == "true" {
+		w.Write([]byte(`
+            <div class="rounded-md bg-green-50 p-4">
+                <div class="flex">
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800">Settings Updated Successfully</h3>
+                        <div class="mt-2 text-sm text-green-700">
+                            <p>Your store information has been updated.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `))
+		return
+	}
+
+	http.Redirect(w, r, "/merchant/settings", http.StatusSeeOther)
 }

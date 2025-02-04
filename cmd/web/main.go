@@ -126,6 +126,10 @@ func main() {
 	// mux.Handle("GET /{region}/{slug}", sessionManager.LoadAndSave(http.HandlerFunc(app.StoreProfile)))
 	mux.Handle("GET /ballarat/{slug}", combinedMiddleware(app.StoreProfile))
 
+	// Store settings routes
+	mux.Handle("GET /merchant/settings", combinedMiddleware(app.StoreSettings))
+	mux.Handle("POST /merchant/settings", combinedMiddleware(app.StoreSettingsPost))
+
 	// Static file servers (no middleware needed)
 	mux.Handle("GET /assets/", http.StripPrefix("/assets", assetsServer))
 	mux.Handle("GET /static/", http.StripPrefix("/static", staticServer))

@@ -1,0 +1,113 @@
+{{define "title"}}Store Settings - TownCentre{{end}} {{define "main"}}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="md:flex md:items-center md:justify-between mb-6">
+    <div class="flex-1 min-w-0">
+      <h2
+        class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate"
+      >
+        Store Settings
+      </h2>
+    </div>
+    <div class="mt-4 flex md:mt-0 md:ml-4">
+      <a
+        href="/merchant/dashboard"
+        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+      >
+        Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <div class="bg-white shadow sm:rounded-lg">
+    <form hx-post="/merchant/settings" hx-swap="afterend">
+      <div class="p-6 space-y-6">
+        <!-- Store Name -->
+        <div>
+          <label
+            for="store-name"
+            class="block text-sm font-medium text-gray-700"
+            >Store Name</label
+          >
+          <p class="mt-1 text-sm text-gray-500">
+            This is how your store will appear to customers.
+          </p>
+          <input
+            type="text"
+            name="store-name"
+            id="store-name"
+            value="{{.Merchant.StoreName}}"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+
+        <!-- Store Description -->
+        <div>
+          <label
+            for="description"
+            class="block text-sm font-medium text-gray-700"
+            >Store Description</label
+          >
+          <p class="mt-1 text-sm text-gray-500">
+            Tell customers about your store and what makes it special.
+          </p>
+          <textarea
+            name="description"
+            id="description"
+            rows="4"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          >
+{{.Merchant.Description}}</textarea
+          >
+        </div>
+
+        <!-- Location -->
+        <div>
+          <label for="location" class="block text-sm font-medium text-gray-700"
+            >Store Location</label
+          >
+          <p class="mt-1 text-sm text-gray-500">
+            Your physical store address (if applicable).
+          </p>
+          <input
+            type="text"
+            name="location"
+            id="location"
+            value="{{.Merchant.Location}}"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+
+        <!-- Opening Hours -->
+        <div>
+          <label
+            for="opening-hours"
+            class="block text-sm font-medium text-gray-700"
+            >Opening Hours</label
+          >
+          <p class="mt-1 text-sm text-gray-500">
+            Enter your store's opening hours. Use new lines for different days.
+          </p>
+          <textarea
+            name="opening-hours"
+            id="opening-hours"
+            rows="4"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          >
+{{.Merchant.OpeningHours}}</textarea
+          >
+        </div>
+
+        <!-- Save Button -->
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{{end}}
