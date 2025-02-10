@@ -128,19 +128,31 @@ func (m *MerchantModel) Authenticate(email, password string) (*Merchant, error) 
 	return merchant, nil
 }
 
-// GetByID retrieves a merchant by their ID
 func (m *MerchantModel) GetByID(id int64) (*Merchant, error) {
 	merchant := &Merchant{}
 
-	stmt := `SELECT id, business_name, email, phone, business_type, created_at, updated_at 
-             FROM merchants WHERE id = ?`
+	// Use NullString for fields that could be NULL
+	var description, location, openingHours, phone sql.NullString
+
+	stmt := `
+        SELECT id, business_name, store_name, store_slug, region,
+               description, email, phone, business_type, location,
+               opening_hours, created_at, updated_at 
+        FROM merchants 
+        WHERE id = ?`
 
 	err := m.DB.QueryRow(stmt, id).Scan(
 		&merchant.ID,
 		&merchant.BusinessName,
+		&merchant.StoreName,
+		&merchant.StoreSlug,
+		&merchant.Region,
+		&description, // Changed from &merchant.Description
 		&merchant.Email,
-		&merchant.Phone,
+		&phone, // Changed from &merchant.Phone
 		&merchant.BusinessType,
+		&location,     // Changed from &merchant.Location
+		&openingHours, // Changed from &merchant.OpeningHours
 		&merchant.CreatedAt,
 		&merchant.UpdatedAt,
 	)
@@ -148,7 +160,25 @@ func (m *MerchantModel) GetByID(id int64) (*Merchant, error) {
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return merchant, err
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert NullString to string, using empty string if NULL
+	if description.Valid {
+		merchant.Description = description.String
+	}
+	if location.Valid {
+		merchant.Location = location.String
+	}
+	if openingHours.Valid {
+		merchant.OpeningHours = openingHours.String
+	}
+	if phone.Valid {
+		merchant.Phone = phone.String
+	}
+
+	return merchant, nil
 }
 func generateSlug(name string) string {
 	// Convert to lowercase
@@ -183,32 +213,42 @@ func (m *MerchantModel) GetByStoreSlugAndRegion(slug, region string) (*Merchant,
         WHERE store_slug = ? AND region = ?`
 
 	merchant := &Merchant{}
+
+	// Use NullString for fields that could be NULL
+	var description, location, openingHours, phone sql.NullString
+
 	err := m.DB.QueryRow(stmt, slug, region).Scan(
 		&merchant.ID,
 		&merchant.BusinessName,
 		&merchant.StoreName,
 		&merchant.StoreSlug,
 		&merchant.Region,
-		&merchant.Description,
+		&description, // Changed from &merchant.Description
 		&merchant.Email,
-		&merchant.Phone,
+		&phone, // Changed from &merchant.Phone
 		&merchant.BusinessType,
-		&merchant.Location,
-		&merchant.OpeningHours,
+		&location,     // Changed from &merchant.Location
+		&openingHours, // Changed from &merchant.OpeningHours
 		&merchant.CreatedAt,
 		&merchant.UpdatedAt,
 	)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, err
-		}
-		return nil, fmt.Errorf("error fetching merchant by slug: %v", err)
+		return nil, err
 	}
 
-	// If store_name is empty, use business_name
-	if merchant.StoreName == "" {
-		merchant.StoreName = merchant.BusinessName
+	// Convert NullString to string, using empty string if NULL
+	if description.Valid {
+		merchant.Description = description.String
+	}
+	if location.Valid {
+		merchant.Location = location.String
+	}
+	if openingHours.Valid {
+		merchant.OpeningHours = openingHours.String
+	}
+	if phone.Valid {
+		merchant.Phone = phone.String
 	}
 
 	return merchant, nil
@@ -235,4 +275,65 @@ func (m *MerchantModel) UpdateStoreInfo(merchant *Merchant) error {
 	}
 
 	return nil
+}
+
+func (m *MerchantModel) GetFeatured() ([]*Merchant, error) {
+	stmt := `
+        SELECT id, business_name, store_name, store_slug, region,
+               description, email, phone, business_type, location,
+               opening_hours, created_at, updated_at
+        FROM merchants
+        WHERE region = 'ballarat'
+        ORDER BY created_at DESC
+        LIMIT 6`
+
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var merchants []*Merchant
+	for rows.Next() {
+		m := &Merchant{}
+		// Use NullString for fields that could be NULL
+		var description, location, openingHours, phone sql.NullString
+
+		err := rows.Scan(
+			&m.ID,
+			&m.BusinessName,
+			&m.StoreName,
+			&m.StoreSlug,
+			&m.Region,
+			&description,
+			&m.Email,
+			&phone,
+			&m.BusinessType,
+			&location,
+			&openingHours,
+			&m.CreatedAt,
+			&m.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		// Convert NullString to string, using empty string if NULL
+		if description.Valid {
+			m.Description = description.String
+		}
+		if location.Valid {
+			m.Location = location.String
+		}
+		if openingHours.Valid {
+			m.OpeningHours = openingHours.String
+		}
+		if phone.Valid {
+			m.Phone = phone.String
+		}
+
+		merchants = append(merchants, m)
+	}
+
+	return merchants, nil
 }

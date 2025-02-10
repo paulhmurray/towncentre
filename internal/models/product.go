@@ -20,6 +20,8 @@ type Product struct {
 	HasPickup     bool
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
+	BusinessName  string // For displaying the store name with the product
+	Location      string // For displaying the store location
 }
 
 type ProductModel struct {
@@ -112,20 +114,36 @@ func (m *ProductModel) Update(p *Product) error {
 }
 
 // Get a single product by ID for a specific merchant
-func (m *ProductModel) GetByID(productID, merchantID int64) (*Product, error) {
+func (m *ProductModel) GetByID(productID int64, merchantID int64) (*Product, error) {
 	log.Printf("Getting product %d for merchant %d", productID, merchantID)
 
-	stmt := `
-        SELECT id, merchant_id, name, description, price, 
-               category, image_path, thumbnail_path,
-               has_delivery, has_pickup, created_at, updated_at
-        FROM products 
-        WHERE id = ? AND merchant_id = ?`
+	var stmt string
+	var args []interface{}
+
+	if merchantID > 0 {
+		// For merchant viewing (checks ownership)
+		stmt = `
+            SELECT id, merchant_id, name, description, price, 
+                   category, image_path, thumbnail_path,
+                   has_delivery, has_pickup, created_at, updated_at
+            FROM products 
+            WHERE id = ? AND merchant_id = ?`
+		args = []interface{}{productID, merchantID}
+	} else {
+		// For public viewing (no ownership check)
+		stmt = `
+            SELECT id, merchant_id, name, description, price, 
+                   category, image_path, thumbnail_path,
+                   has_delivery, has_pickup, created_at, updated_at
+            FROM products 
+            WHERE id = ?`
+		args = []interface{}{productID}
+	}
 
 	p := &Product{}
 	var imagePath, thumbnailPath sql.NullString
 
-	err := m.DB.QueryRow(stmt, productID, merchantID).Scan(
+	err := m.DB.QueryRow(stmt, args...).Scan(
 		&p.ID,
 		&p.MerchantID,
 		&p.Name,
@@ -203,6 +221,61 @@ func (m *ProductModel) GetByMerchantID(merchantID int64) ([]*Product, error) {
 		if thumbnailPath.Valid {
 			p.ThumbnailPath = &thumbnailPath.String
 		}
+		products = append(products, p)
+	}
+
+	return products, nil
+}
+
+// for home page featured products
+func (m *ProductModel) GetFeatured() ([]*Product, error) {
+	stmt := `
+        SELECT p.id, p.merchant_id, p.name, p.description, p.price, 
+               p.category, p.image_path, p.thumbnail_path,
+               p.has_delivery, p.has_pickup, p.created_at, p.updated_at,
+               m.business_name, m.location
+        FROM products p
+        JOIN merchants m ON p.merchant_id = m.id
+        ORDER BY p.created_at DESC
+        LIMIT 8`
+
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var products []*Product
+	for rows.Next() {
+		p := &Product{}
+		var imagePath, thumbnailPath sql.NullString
+		var businessName, location sql.NullString
+
+		err := rows.Scan(
+			&p.ID, &p.MerchantID, &p.Name, &p.Description, &p.Price,
+			&p.Category, &imagePath, &thumbnailPath,
+			&p.HasDelivery, &p.HasPickup, &p.CreatedAt, &p.UpdatedAt,
+			&businessName, &location,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		if imagePath.Valid {
+			p.ImagePath = &imagePath.String
+		}
+		if thumbnailPath.Valid {
+			p.ThumbnailPath = &thumbnailPath.String
+		}
+		if businessName.Valid {
+			p.BusinessName = businessName.String
+		}
+		if location.Valid {
+			p.Location = location.String
+		} else {
+			p.Location = "Ballarat" // Default location
+		}
+
 		products = append(products, p)
 	}
 

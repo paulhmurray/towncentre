@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"html/template"
@@ -30,26 +31,104 @@ type Application struct {
 
 type templateData struct {
 	IsAuthenticated bool
-	Merchant        *models.Merchant
+	Merchant        *models.Merchant   // Logged in merchant
+	Store           *models.Merchant   // Merchant being viewed
+	Merchants       []*models.Merchant // List of merchants
 	Products        []*models.Product
 	Product         *models.Product
-	Store           *models.Merchant
+	Error           string
 }
 
 // Home handler
 func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
-	app.render(w, r, http.StatusOK, "home.page.html", nil)
+	// Get featured products
+	products, err := app.Products.GetFeatured()
+	if err != nil {
+		log.Printf("Error fetching featured products: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get featured stores (previously "local shops")
+	merchants, err := app.Merchants.GetFeatured()
+	if err != nil {
+		log.Printf("Error fetching featured stores: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	data := &templateData{
+		Products:  products,
+		Merchants: merchants, // Use new field name
+	}
+
+	app.render(w, r, http.StatusOK, "home.page.html", data)
+}
+
+// Launch handler (temporary landing page)
+func (app *Application) Launch(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, http.StatusOK, "launch.page.html", nil)
 }
 
 // ProductView handler
 func (app *Application) ProductView(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil || id < 1 {
+	log.Printf("ProductView - URL Path: %s", r.URL.Path)
+
+	// Get the product ID from the URL
+	productIDStr := r.PathValue("id")
+	log.Printf("ProductView - ID from URL: %s", productIDStr)
+
+	productID, err := strconv.ParseInt(productIDStr, 10, 64)
+	if err != nil || productID < 1 {
+		log.Printf("ProductView - Invalid product ID: %v", err)
 		http.NotFound(w, r)
 		return
 	}
-	msg := fmt.Sprintf("Display a specific snippet with ID %d...", id)
-	w.Write([]byte(msg))
+
+	// Get the product details
+	product, err := app.Products.GetByID(productID, 0) // Using 0 as merchantID to bypass ownership check
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Printf("ProductView - Product not found in database: %d", productID)
+			http.NotFound(w, r)
+		} else {
+			log.Printf("ProductView - Database error: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	if product == nil {
+		log.Printf("ProductView - Product is nil after database query")
+		http.NotFound(w, r)
+		return
+	}
+
+	log.Printf("ProductView - Found product in database: %+v", product)
+
+	// Get the merchant (store) details
+	merchant, err := app.Merchants.GetByID(product.MerchantID)
+	if err != nil {
+		log.Printf("ProductView - Error fetching merchant: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Prepare template data
+	data := &templateData{
+		Product: product,
+		Store:   merchant,
+	}
+
+	// Check if template exists in cache
+	if _, ok := app.TemplateCache["product.view.page.html"]; !ok {
+		log.Printf("ProductView - Template 'product.view.page.html' not found in cache")
+		http.Error(w, "Template not found", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("ProductView - About to render template")
+	app.render(w, r, http.StatusOK, "product.view.page.html", data)
 }
 
 // MerchantProductView handler
@@ -455,40 +534,32 @@ func (app *Application) MerchantLogin(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
 			log.Printf("Error parsing form: %v", err)
-			http.Error(w, "Invalid form data", http.StatusBadRequest)
+			app.handleLoginError(w, r, "Invalid form data")
 			return
 		}
 
 		email := r.PostForm.Get("email")
 		password := r.PostForm.Get("password")
 
+		// Basic validation
+		if email == "" || password == "" {
+			app.handleLoginError(w, r, "Please enter both email and password")
+			return
+		}
+
 		merchant, err := app.Merchants.Authenticate(email, password)
 		if err != nil {
 			log.Printf("Authentication error: %v", err)
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			app.handleLoginError(w, r, "An error occurred while trying to log in")
 			return
 		}
 
 		if merchant == nil {
-			if r.Header.Get("HX-Request") == "true" {
-				w.Write([]byte(`
-                    <div class="rounded-md bg-red-50 p-4 mt-4">
-                        <div class="flex">
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-red-800">Invalid credentials</h3>
-                                <div class="mt-2 text-sm text-red-700">
-                                    <p>Please check your email and password and try again.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `))
-				return
-			}
-			http.Redirect(w, r, "/merchant/login", http.StatusSeeOther)
+			app.handleLoginError(w, r, "Invalid email or password")
 			return
 		}
 
+		// Success path
 		app.Sessions.Put(r.Context(), "merchantID", merchant.ID)
 
 		if r.Header.Get("HX-Request") == "true" {
@@ -497,6 +568,31 @@ func (app *Application) MerchantLogin(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, "/merchant/dashboard", http.StatusSeeOther)
 	}
+}
+
+// Helper function to handle login errors consistently
+func (app *Application) handleLoginError(w http.ResponseWriter, r *http.Request, message string) {
+	if r.Header.Get("HX-Request") == "true" {
+		w.Write([]byte(`
+            <div class="rounded-md bg-red-50 p-4 mt-4">
+                <div class="flex">
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Invalid credentials</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <p>` + message + `</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `))
+		return
+	}
+
+	// For non-HTMX requests, show error on login page
+	data := &templateData{
+		Error: message,
+	}
+	app.render(w, r, http.StatusUnprocessableEntity, "merchant.login.page.html", data)
 }
 
 // MerchantDashboard handler
@@ -544,34 +640,74 @@ func (app *Application) MerchantLogout(w http.ResponseWriter, r *http.Request) {
 func (app *Application) render(w http.ResponseWriter, r *http.Request, status int, page string, data interface{}) {
 	ts, ok := app.TemplateCache[page]
 	if !ok {
+		log.Printf("Template not found: %s", page)
 		http.Error(w, "Template not found", http.StatusInternalServerError)
 		return
 	}
 
+	// Initialize template data
 	td := &templateData{
-		IsAuthenticated: app.Sessions.Exists(r.Context(), "merchantID"),
+		IsAuthenticated: false,
+		Merchant:        nil,
 	}
 
-	if td.IsAuthenticated {
+	// Check authentication and load merchant data if authenticated
+	if app.Sessions.Exists(r.Context(), "merchantID") {
 		if merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64); ok {
 			merchant, err := app.Merchants.GetByID(merchantID)
-			if err == nil {
+			if err != nil {
+				log.Printf("Error loading merchant data: %v", err)
+				// Don't return error, continue with nil merchant
+			} else if merchant != nil {
+				td.IsAuthenticated = true
 				td.Merchant = merchant
 			}
 		}
 	}
 
+	// If data was passed in, merge it with existing template data
 	if data != nil {
-		td = data.(*templateData)
+		// Type assert the data
+		if newData, ok := data.(*templateData); ok {
+			// Preserve authentication state and merchant data if not overridden
+			if newData.Merchant != nil {
+				td.Merchant = newData.Merchant
+			}
+			if newData.Products != nil {
+				td.Products = newData.Products
+			}
+			if newData.Product != nil {
+				td.Product = newData.Product
+			}
+			if newData.Store != nil {
+				td.Store = newData.Store
+			}
+
+			td.IsAuthenticated = td.IsAuthenticated || newData.IsAuthenticated
+		}
 	}
 
-	w.WriteHeader(status)
-	err := ts.ExecuteTemplate(w, "base", td)
+	// Create a buffer to render the template first
+	buf := new(bytes.Buffer)
+
+	// Execute template into buffer
+	err := ts.ExecuteTemplate(buf, "base", td)
 	if err != nil {
+		log.Printf("Error executing template: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Write status code
+	w.WriteHeader(status)
+
+	// Copy buffer to response writer
+	_, err = buf.WriteTo(w)
+	if err != nil {
+		log.Printf("Error writing template to response: %v", err)
+		return
 	}
 }
-
 func createThumbnail(originalPath string) (string, error) {
 	log.Printf("Starting thumbnail creation for: %s", originalPath)
 
@@ -650,8 +786,6 @@ func (app *Application) StoreProfile(w http.ResponseWriter, r *http.Request) {
 	// Render the store profile template
 	app.render(w, r, http.StatusOK, "store.page.html", data)
 }
-
-// Add to handlers.go
 
 func (app *Application) StoreSettings(w http.ResponseWriter, r *http.Request) {
 	// Get the merchant ID from the session

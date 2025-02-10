@@ -3,33 +3,31 @@
 <div class="bg-white">
   <!-- Hero Section -->
   <div class="relative">
-    <!-- Background image container -->
     <div class="absolute inset-0">
       <img
         src="/assets/lake_wendouree.jpg"
         alt="Ballarat"
         class="w-full h-full object-cover"
       />
-      <!-- Dark overlay for better text readability -->
       <div
         class="absolute inset-0 bg-indigo-600 mix-blend-multiply opacity-90"
       ></div>
     </div>
 
     <!-- Content -->
-    <div class="relative px-6 py-16">
+    <div class="relative px-4 sm:px-6 py-12 sm:py-16">
       <div class="max-w-2xl mx-auto text-center text-white">
-        <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
           Discover Ballarat's Local Shops
         </h1>
-        <p class="mt-6 text-lg leading-8">
+        <p class="mt-4 sm:mt-6 text-base sm:text-lg leading-8">
           Support local businesses and find unique products from your community
         </p>
         <!-- Search bar -->
         <form
-          class="mt-8 max-w-md mx-auto"
+          class="mt-6 sm:mt-8 max-w-md mx-auto"
           hx-get="/search"
-          hx-trigger="submit,keyup delay:500ms changed"
+          hx-trigger="input changed delay:500ms"
           hx-target="#search-results"
         >
           <div class="relative">
@@ -37,9 +35,28 @@
               type="text"
               name="q"
               placeholder="Search for local shops and products..."
-              class="w-full px-4 py-3 rounded-lg text-gray-900 focus:ring-2 focus:ring-indigo-200"
+              class="pl-4 w-full px-12 py-3 rounded-lg text-gray-900 bg-white/95 focus:ring-2 focus:ring-indigo-200 placeholder-gray-500"
             />
+            <div
+              class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+            >
+              <svg
+                class="p-4 h-5 w-5 text-gray-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
           </div>
+          <div
+            id="search-results"
+            class="absolute z-10 w-full mt-2 bg-white rounded-lg shadow-lg overflow-hidden"
+          ></div>
         </form>
       </div>
     </div>
@@ -51,8 +68,9 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <a href="/category/food" class="group">
         <div
-          class="bg-gray-100 rounded-lg p-6 text-center hover:bg-gray-200 transition"
+          class="bg-white rounded-lg p-6 text-center hover:bg-gray-50 transition duration-200 shadow-sm"
         >
+          <span class="text-3xl mb-2 block">🍽️</span>
           <span class="block text-lg font-medium text-gray-900"
             >Food & Drink</span
           >
@@ -60,22 +78,25 @@
       </a>
       <a href="/category/retail" class="group">
         <div
-          class="bg-gray-100 rounded-lg p-6 text-center hover:bg-gray-200 transition"
+          class="bg-white rounded-lg p-6 text-center hover:bg-gray-50 transition duration-200 shadow-sm"
         >
+          <span class="text-3xl mb-2 block">🛍️</span>
           <span class="block text-lg font-medium text-gray-900">Retail</span>
         </div>
       </a>
       <a href="/category/services" class="group">
         <div
-          class="bg-gray-100 rounded-lg p-6 text-center hover:bg-gray-200 transition"
+          class="bg-white rounded-lg p-6 text-center hover:bg-gray-50 transition duration-200 shadow-sm"
         >
+          <span class="text-3xl mb-2 block">🔧</span>
           <span class="block text-lg font-medium text-gray-900">Services</span>
         </div>
       </a>
       <a href="/category/crafts" class="group">
         <div
-          class="bg-gray-100 rounded-lg p-6 text-center hover:bg-gray-200 transition"
+          class="bg-white rounded-lg p-6 text-center hover:bg-gray-50 transition duration-200 shadow-sm"
         >
+          <span class="text-3xl mb-2 block">🎨</span>
           <span class="block text-lg font-medium text-gray-900"
             >Local Crafts</span
           >
@@ -87,60 +108,76 @@
   <!-- Featured Products Section -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <h2 class="text-2xl font-bold mb-6">Featured Products</h2>
-    <div
-      id="featured-products"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-    >
-      <!-- Sample Product Card -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {{range .Products}}
       <div class="bg-white rounded-lg shadow-sm border p-4">
-        <div
-          class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg mb-4"
-        >
-          <img
-            src="/api/placeholder/300/300"
-            alt="Product"
-            class="object-cover"
-          />
-        </div>
-        <h3 class="text-lg font-medium text-gray-900">Sample Product</h3>
-        <p class="text-sm text-gray-500">Sample Shop</p>
-        <div class="mt-2 flex items-center justify-between">
-          <span class="text-lg font-bold">$29.99</span>
-          <span class="text-sm text-gray-500">Ballarat Central</span>
-        </div>
+        <a href="/product/view/{{.ID}}" class="block">
+          <div
+            class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg mb-4"
+          >
+            {{if .ImagePath}}
+            <img
+              src="{{.ImagePath}}"
+              alt="{{.Name}}"
+              class="h-48 w-full object-cover"
+            />
+            {{else}}
+            <img
+              src="/api/placeholder/300/300"
+              alt="{{.Name}}"
+              class="h-48 w-full object-cover"
+            />
+            {{end}}
+          </div>
+          <h3 class="text-lg font-medium text-gray-900">{{.Name}}</h3>
+          <p class="text-sm text-gray-500">{{.BusinessName}}</p>
+          <div class="mt-2 flex items-center justify-between">
+            <span class="text-lg font-bold">${{printf "%.2f" .Price}}</span>
+            <span class="text-sm text-gray-500">{{.Location}}</span>
+          </div>
+        </a>
       </div>
-      <!-- More product cards will be added dynamically -->
+      {{else}}
+      <div class="col-span-full text-center py-8 text-gray-500">
+        No featured products available at the moment
+      </div>
+      {{end}}
     </div>
   </div>
 
-  <!-- Local Shops Section -->
+  <!-- Merchants Section -->
   <div class="bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h2 class="text-2xl font-bold mb-6">Local Shops</h2>
+      <h2 class="text-2xl font-bold mb-6">Featured Stores</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {{range .Merchants}}
         <div class="bg-white rounded-lg shadow-sm p-6">
-          <h3 class="text-lg font-medium mb-2">Local Shop Name</h3>
-          <p class="text-sm text-gray-500 mb-4">
-            123 Sturt Street, Ballarat Central
-          </p>
+          <h3 class="text-lg font-medium mb-2">{{.BusinessName}}</h3>
+          {{if .Description}}
+          <p class="text-sm text-gray-500 mb-4">{{.Description}}</p>
+          {{end}} {{if .Location}}
+          <p class="text-sm text-gray-500 mb-4">{{.Location}}</p>
+          {{end}}
           <div class="flex items-center space-x-4">
+            {{if .OpeningHours}}
             <span class="text-sm bg-green-100 text-green-800 px-2 py-1 rounded"
               >Open Today</span
             >
-            <a href="#" class="text-indigo-600 hover:text-indigo-500"
-              >View Products</a
+            {{end}}
+            <a
+              href="/ballarat/{{.Slug}}"
+              class="text-indigo-600 hover:text-indigo-500"
+              >View Store</a
             >
           </div>
         </div>
-        <!-- More shop cards will be added dynamically -->
+        {{else}}
+        <div class="col-span-full text-center py-8 text-gray-500">
+          No stores available at the moment
+        </div>
+        {{end}}
       </div>
     </div>
   </div>
-
-  <!-- Search Results Container -->
-  <div
-    id="search-results"
-    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
-  ></div>
 </div>
 {{end}}

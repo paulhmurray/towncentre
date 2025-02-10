@@ -111,6 +111,7 @@ func main() {
 
 	// Routes with combined middleware
 	mux.Handle("GET /{$}", combinedMiddleware(app.Home))
+	mux.Handle("GET /launch", combinedMiddleware(app.Launch))
 	mux.Handle("GET /product/view/{id}", combinedMiddleware(app.ProductView))
 	mux.Handle("GET /merchant/product/view", combinedMiddleware(app.MerchantProductView))
 	mux.Handle("GET /merchant/product/create", combinedMiddleware(app.MerchantProductCreate))

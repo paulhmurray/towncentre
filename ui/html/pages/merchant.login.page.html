@@ -2,10 +2,10 @@
 <div
   class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
 >
-  <div class="max-w-md w-full space-y-8">
+  <div class="max-w-md w-full space-y-8" id="login-container">
     <div>
       <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        Sign in to your merchant account
+        Sign in to your store
       </h2>
       <p class="mt-2 text-center text-sm text-gray-600">
         Or
@@ -13,11 +13,41 @@
           href="/merchant/register"
           class="font-medium text-indigo-600 hover:text-indigo-500"
         >
-          start your business today
+          open your store today
         </a>
       </p>
     </div>
-    <form hx-post="/merchant/login" hx-swap="outerHTML" class="mt-8 space-y-6">
+
+    <!-- Error Message -->
+    {{if .Error}}
+    <div class="rounded-md bg-red-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-red-400"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-red-800">{{.Error}}</p>
+        </div>
+      </div>
+    </div>
+    {{end}}
+
+    <form
+      hx-post="/merchant/login"
+      hx-target="#login-container"
+      class="mt-8 space-y-6"
+    >
       <div class="rounded-md shadow-sm -space-y-px">
         <div>
           <label for="email" class="sr-only">Email address</label>
@@ -43,10 +73,19 @@
         </div>
       </div>
 
-      <div>
+      <div class="flex items-center justify-between">
+        <div class="text-sm">
+          <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+            Forgot your password?
+          </a>
+        </div>
+      </div>
+
+      <div class="relative">
         <button
           type="submit"
           class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          hx-disable-element="this"
         >
           <span class="absolute left-0 inset-y-0 flex items-center pl-3">
             <svg
@@ -63,7 +102,7 @@
               />
             </svg>
           </span>
-          Sign in
+          <span class="htmx-indicator-show:hidden">Sign in</span>
         </button>
       </div>
     </form>
