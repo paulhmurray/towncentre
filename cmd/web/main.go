@@ -144,6 +144,7 @@ func main() {
 	mux.Handle("POST /merchant/login", combinedMiddleware(app.MerchantLogin))
 	mux.Handle("POST /merchant/logout", combinedMiddleware(app.MerchantLogout))
 
+	// Message routes with combined middleware
 	mux.Handle("POST /store/{id}/message", combinedMiddleware(app.StoreMessageCreate))
 	mux.Handle("GET /merchant/messages", combinedMiddleware(app.MerchantMessages))
 	mux.Handle("POST /merchant/message/{id}/read", combinedMiddleware(app.MarkMessageAsRead))

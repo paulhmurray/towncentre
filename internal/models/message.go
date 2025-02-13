@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+	"log"
 	"regexp"
 	"strings"
 	"time"
@@ -87,6 +89,7 @@ func (m *MessageModel) Insert(msg *Message) error {
 }
 
 func (m *MessageModel) GetUnreadCount(merchantID int64) (int, error) {
+	log.Printf("Getting unread count for merchant ID: %d", merchantID)
 	var count int
 	stmt := `
         SELECT COUNT(*) 
@@ -94,10 +97,17 @@ func (m *MessageModel) GetUnreadCount(merchantID int64) (int, error) {
         WHERE merchant_id = ? AND is_read = false
     `
 	err := m.DB.QueryRow(stmt, merchantID).Scan(&count)
+	if err != nil {
+		log.Printf("Error getting unread count: %v", err)
+		return 0, err
+	}
+	log.Printf("Found %d unread messages", count)
 	return count, err
 }
 
 func (m *MessageModel) GetByMerchantID(merchantID int64) ([]*Message, error) {
+	log.Printf("Getting messages for merchant %d", merchantID)
+
 	stmt := `
         SELECT id, merchant_id, customer_name, customer_email,
                customer_phone, message, is_read, status, created_at
@@ -108,33 +118,84 @@ func (m *MessageModel) GetByMerchantID(merchantID int64) ([]*Message, error) {
 
 	rows, err := m.DB.Query(stmt, merchantID)
 	if err != nil {
+		log.Printf("Error querying messages: %v", err)
 		return nil, err
 	}
 	defer rows.Close()
 
 	var messages []*Message
 	for rows.Next() {
-		m := &Message{}
+		msg := &Message{}
 		err := rows.Scan(
-			&m.ID, &m.MerchantID, &m.CustomerName,
-			&m.CustomerEmail, &m.CustomerPhone, &m.MessageText,
-			&m.IsRead, &m.Status, &m.CreatedAt,
+			&msg.ID, &msg.MerchantID, &msg.CustomerName,
+			&msg.CustomerEmail, &msg.CustomerPhone, &msg.MessageText,
+			&msg.IsRead, &msg.Status, &msg.CreatedAt,
 		)
 		if err != nil {
+			log.Printf("Error scanning message: %v", err)
 			return nil, err
 		}
-		messages = append(messages, m)
+		messages = append(messages, msg)
+		log.Printf("Added message: %+v", msg)
 	}
 
+	log.Printf("Returning %d messages", len(messages))
 	return messages, nil
 }
 
 func (m *MessageModel) MarkAsRead(messageID, merchantID int64) error {
+	log.Printf("Marking message %d as read for merchant %d", messageID, merchantID)
+
 	stmt := `
         UPDATE messages 
         SET is_read = true 
         WHERE id = ? AND merchant_id = ?
     `
-	_, err := m.DB.Exec(stmt, messageID, merchantID)
-	return err
+	result, err := m.DB.Exec(stmt, messageID, merchantID)
+	if err != nil {
+		log.Printf("Error marking message as read: %v", err)
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("no message found with ID %d for merchant %d", messageID, merchantID)
+	}
+
+	log.Printf("Successfully marked message %d as read", messageID)
+	return nil
+}
+func (m *MessageModel) GetByID(messageID, merchantID int64) (*Message, error) {
+	log.Printf("Getting message ID: %d for merchant ID: %d", messageID, merchantID)
+
+	stmt := `
+        SELECT id, merchant_id, customer_name, customer_email,
+               customer_phone, message, is_read, status, created_at
+        FROM messages
+        WHERE id = ? AND merchant_id = ?
+    `
+
+	msg := &Message{}
+	err := m.DB.QueryRow(stmt, messageID, merchantID).Scan(
+		&msg.ID,
+		&msg.MerchantID,
+		&msg.CustomerName,
+		&msg.CustomerEmail,
+		&msg.CustomerPhone,
+		&msg.MessageText,
+		&msg.IsRead,
+		&msg.Status,
+		&msg.CreatedAt,
+	)
+
+	if err != nil {
+		log.Printf("Error getting message: %v", err)
+		return nil, err
+	}
+
+	log.Printf("Found message: %+v", msg)
+	return msg, nil
 }

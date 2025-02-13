@@ -40,6 +40,7 @@ type templateData struct {
 	Error              string
 	MessagesList       []*models.Message
 	UnreadMessageCount int
+	TotalProducts      int
 }
 
 // Home handler
@@ -618,6 +619,12 @@ func (app *Application) MerchantDashboard(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	// Get total product count
+	totalProducts, err := app.Products.GetTotalCount(merchantID)
+	if err != nil {
+		log.Printf("Error getting product count: %v", err)
+		totalProducts = 0 // Fall back to 0 if there's an error
+	}
 	// Get unread message count
 	unreadCount, err := app.Messages.GetUnreadCount(merchantID)
 	if err != nil {
@@ -631,6 +638,7 @@ func (app *Application) MerchantDashboard(w http.ResponseWriter, r *http.Request
 		Merchant:           merchant,
 		Products:           products,
 		UnreadMessageCount: unreadCount,
+		TotalProducts:      totalProducts,
 	}
 
 	app.render(w, r, http.StatusOK, "merchant.dashboard.page.html", data)
@@ -692,6 +700,15 @@ func (app *Application) render(w http.ResponseWriter, r *http.Request, status in
 			}
 			if newData.Store != nil {
 				td.Store = newData.Store
+			}
+			if newData.MessagesList != nil { // Add this block
+				td.MessagesList = newData.MessagesList
+			}
+			if newData.UnreadMessageCount > 0 { // And this for the unread count
+				td.UnreadMessageCount = newData.UnreadMessageCount
+			}
+			if newData.TotalProducts > 0 {
+				td.TotalProducts = newData.TotalProducts
 			}
 
 			td.IsAuthenticated = td.IsAuthenticated || newData.IsAuthenticated
@@ -941,13 +958,17 @@ func (app *Application) MerchantMessages(w http.ResponseWriter, r *http.Request)
 	// Get merchant ID from session
 	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
 	if !ok {
+		log.Printf("No merchant ID in session")
 		http.Redirect(w, r, "/merchant/login", http.StatusSeeOther)
 		return
 	}
 
+	log.Printf("Loading messages page for merchant ID: %d", merchantID)
+
 	// Get merchant data
 	merchant, err := app.Merchants.GetByID(merchantID)
 	if err != nil {
+		log.Printf("Error fetching merchant: %v", err)
 		http.Error(w, "Error fetching merchant data", http.StatusInternalServerError)
 		return
 	}
@@ -955,9 +976,13 @@ func (app *Application) MerchantMessages(w http.ResponseWriter, r *http.Request)
 	// Get messages
 	messages, err := app.Messages.GetByMerchantID(merchantID)
 	if err != nil {
+		log.Printf("Error fetching messages: %v", err)
 		http.Error(w, "Error fetching messages", http.StatusInternalServerError)
 		return
 	}
+
+	log.Printf("Messages before creating data: %+v", messages)
+	log.Printf("Number of messages found: %d", len(messages))
 
 	// Prepare template data
 	data := &templateData{
@@ -965,6 +990,10 @@ func (app *Application) MerchantMessages(w http.ResponseWriter, r *http.Request)
 		Merchant:        merchant,
 		MessagesList:    messages,
 	}
+
+	log.Printf("Data being sent to template: %+v", data)
+	log.Printf("MessagesList in data: %+v", data.MessagesList)
+	log.Printf("Length of MessagesList in data: %d", len(data.MessagesList))
 
 	app.render(w, r, http.StatusOK, "merchant.messages.page.html", data)
 }
@@ -992,26 +1021,68 @@ func (app *Application) MarkMessageAsRead(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// Refresh the messages list
-	messages, err := app.Messages.GetByMerchantID(merchantID)
+	// Get the updated message
+	message, err := app.Messages.GetByID(messageID, merchantID)
 	if err != nil {
-		http.Error(w, "Error fetching messages", http.StatusInternalServerError)
+		http.Error(w, "Error fetching updated message", http.StatusInternalServerError)
 		return
 	}
 
-	// Get merchant data
-	merchant, err := app.Merchants.GetByID(merchantID)
-	if err != nil {
-		http.Error(w, "Error fetching merchant data", http.StatusInternalServerError)
-		return
+	// Construct phone number HTML if it exists
+	phoneHTML := ""
+	if message.CustomerPhone != "" {
+		phoneHTML = fmt.Sprintf(`
+            <span class="ml-4 text-sm text-gray-500">
+                <a href="tel:%s" class="hover:text-indigo-600">%s</a>
+            </span>
+        `, message.CustomerPhone, message.CustomerPhone)
 	}
 
-	// Re-render the entire messages page
-	data := &templateData{
-		IsAuthenticated: true,
-		Merchant:        merchant,
-		MessagesList:    messages,
-	}
+	// Return just the updated message HTML
+	html := fmt.Sprintf(`
+        <li id="message-%d" class="hover:bg-gray-50">
+            <div class="px-4 py-5 sm:px-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center">
+                            <!-- Customer Icon -->
+                            <div class="flex-shrink-0">
+                                <span class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </span>
+                            </div>
+                            <!-- Customer Details -->
+                            <div class="ml-4">
+                                <h2 class="text-sm font-medium text-gray-900">%s</h2>
+                                <div class="mt-1 flex items-center">
+                                    <a href="mailto:%s" class="text-sm text-gray-500 hover:text-indigo-600">%s</a>
+                                    %s
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Message Content -->
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-900 whitespace-pre-line">%s</p>
+                        </div>
+                    </div>
+                    <!-- Time -->
+                    <div class="ml-6 flex-shrink-0 flex flex-col items-end">
+                        <p class="text-sm text-gray-500">%s</p>
+                    </div>
+                </div>
+            </div>
+        </li>
+    `,
+		message.ID,
+		message.CustomerName,
+		message.CustomerEmail,
+		message.CustomerEmail,
+		phoneHTML,
+		message.MessageText,
+		message.CreatedAt.Format("Jan 2, 2006 3:04 PM"),
+	)
 
-	app.render(w, r, http.StatusOK, "merchant.messages.page.html", data)
+	w.Write([]byte(html))
 }

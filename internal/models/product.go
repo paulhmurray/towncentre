@@ -281,3 +281,16 @@ func (m *ProductModel) GetFeatured() ([]*Product, error) {
 
 	return products, nil
 }
+func (m *ProductModel) GetTotalCount(merchantID int64) (int, error) {
+	var count int
+	stmt := `
+        SELECT COUNT(*) 
+        FROM products 
+        WHERE merchant_id = ?
+    `
+	err := m.DB.QueryRow(stmt, merchantID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
