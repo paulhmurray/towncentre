@@ -1,0 +1,63 @@
+{{define "title"}}Messages - TownCentre{{end}} {{define "main"}}
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white shadow">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <h1 class="text-2xl font-bold text-gray-900">Messages</h1>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    {{if .MessagesList}}
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+      <ul role="list" class="divide-y divide-gray-200">
+        {{range .MessagesList}}
+        <li>
+          <div class="px-4 py-4 sm:px-6 {{if not .IsRead}}bg-indigo-50{{end}}">
+            <div class="flex items-center justify-between">
+              <div class="flex flex-col">
+                <p class="text-sm font-medium text-gray-900">
+                  From: {{.CustomerName}} {{if not .IsRead}}
+                  <span
+                    class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
+                  >
+                    New
+                  </span>
+                  {{end}}
+                </p>
+                <p class="text-sm text-gray-500">{{.CustomerEmail}}</p>
+                {{if .CustomerPhone}}
+                <p class="text-sm text-gray-500">Phone: {{.CustomerPhone}}</p>
+                {{end}}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{.CreatedAt.Format "Jan 2, 2006 3:04 PM"}}
+              </div>
+            </div>
+            <div class="mt-2">
+              <p class="text-sm text-gray-600">{{.MessageText}}</p>
+            </div>
+            {{if not .IsRead}}
+            <div class="mt-2">
+              <button
+                hx-post="/merchant/message/{{.ID}}/read"
+                hx-swap="outerHTML"
+                class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
+              >
+                Mark as Read
+              </button>
+            </div>
+            {{end}}
+          </div>
+        </li>
+        {{end}}
+      </ul>
+    </div>
+    {{else}}
+    <div class="text-center py-12 bg-white rounded-lg">
+      <p class="text-gray-500">No messages yet.</p>
+    </div>
+    {{end}}
+  </div>
+</div>
+{{end}}

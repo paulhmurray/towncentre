@@ -27,16 +27,19 @@ type Application struct {
 	Merchants     *models.MerchantModel
 	Products      *models.ProductModel
 	Sessions      *scs.SessionManager
+	Messages      *models.MessageModel
 }
 
 type templateData struct {
-	IsAuthenticated bool
-	Merchant        *models.Merchant   // Logged in merchant
-	Store           *models.Merchant   // Merchant being viewed
-	Merchants       []*models.Merchant // List of merchants
-	Products        []*models.Product
-	Product         *models.Product
-	Error           string
+	IsAuthenticated    bool
+	Merchant           *models.Merchant   // Logged in merchant
+	Store              *models.Merchant   // Merchant being viewed
+	Merchants          []*models.Merchant // List of merchants
+	Products           []*models.Product
+	Product            *models.Product
+	Error              string
+	MessagesList       []*models.Message
+	UnreadMessageCount int
 }
 
 // Home handler
@@ -615,11 +618,19 @@ func (app *Application) MerchantDashboard(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	// Get unread message count
+	unreadCount, err := app.Messages.GetUnreadCount(merchantID)
+	if err != nil {
+		log.Printf("Error getting unread count: %v", err)
+		// Don't return error, just set count to 0
+		unreadCount = 0
+	}
 
 	data := &templateData{
-		IsAuthenticated: true,
-		Merchant:        merchant,
-		Products:        products,
+		IsAuthenticated:    true,
+		Merchant:           merchant,
+		Products:           products,
+		UnreadMessageCount: unreadCount,
 	}
 
 	app.render(w, r, http.StatusOK, "merchant.dashboard.page.html", data)
@@ -861,4 +872,146 @@ func (app *Application) StoreSettingsPost(w http.ResponseWriter, r *http.Request
 	}
 
 	http.Redirect(w, r, "/merchant/settings", http.StatusSeeOther)
+}
+func (app *Application) StoreMessageCreate(w http.ResponseWriter, r *http.Request) {
+	// Parse store ID from URL
+	storeIDStr := r.PathValue("id")
+	storeID, err := strconv.ParseInt(storeIDStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid store ID", http.StatusBadRequest)
+		return
+	}
+
+	// Parse form
+	err = r.ParseForm()
+	if err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	// Create message
+	msg := &models.Message{
+		MerchantID:    storeID,
+		CustomerName:  r.PostForm.Get("name"),
+		CustomerEmail: r.PostForm.Get("email"),
+		CustomerPhone: r.PostForm.Get("phone"),
+		MessageText:   r.PostForm.Get("message"),
+	}
+
+	// Insert message
+	err = app.Messages.Insert(msg)
+	if err != nil {
+		if strings.Contains(err.Error(), "inappropriate content") {
+			// Return specific error for inappropriate content
+			w.Write([]byte(`
+                <div class="rounded-md bg-red-50 p-4">
+                    <div class="flex">
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Message not sent</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <p>Your message contains inappropriate content. Please revise and try again.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `))
+			return
+		}
+
+		http.Error(w, "Error sending message", http.StatusInternalServerError)
+		return
+	}
+
+	// Return success message
+	w.Write([]byte(`
+        <div class="rounded-md bg-green-50 p-4">
+            <div class="flex">
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-green-800">Message sent successfully</h3>
+                    <div class="mt-2 text-sm text-green-700">
+                        <p>The store owner will contact you via email or phone.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `))
+}
+
+func (app *Application) MerchantMessages(w http.ResponseWriter, r *http.Request) {
+	// Get merchant ID from session
+	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
+	if !ok {
+		http.Redirect(w, r, "/merchant/login", http.StatusSeeOther)
+		return
+	}
+
+	// Get merchant data
+	merchant, err := app.Merchants.GetByID(merchantID)
+	if err != nil {
+		http.Error(w, "Error fetching merchant data", http.StatusInternalServerError)
+		return
+	}
+
+	// Get messages
+	messages, err := app.Messages.GetByMerchantID(merchantID)
+	if err != nil {
+		http.Error(w, "Error fetching messages", http.StatusInternalServerError)
+		return
+	}
+
+	// Prepare template data
+	data := &templateData{
+		IsAuthenticated: true,
+		Merchant:        merchant,
+		MessagesList:    messages,
+	}
+
+	app.render(w, r, http.StatusOK, "merchant.messages.page.html", data)
+}
+
+func (app *Application) MarkMessageAsRead(w http.ResponseWriter, r *http.Request) {
+	// Get merchant ID from session
+	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Get message ID from URL
+	messageIDStr := r.PathValue("id")
+	messageID, err := strconv.ParseInt(messageIDStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid message ID", http.StatusBadRequest)
+		return
+	}
+
+	// Mark message as read
+	err = app.Messages.MarkAsRead(messageID, merchantID)
+	if err != nil {
+		http.Error(w, "Error marking message as read", http.StatusInternalServerError)
+		return
+	}
+
+	// Refresh the messages list
+	messages, err := app.Messages.GetByMerchantID(merchantID)
+	if err != nil {
+		http.Error(w, "Error fetching messages", http.StatusInternalServerError)
+		return
+	}
+
+	// Get merchant data
+	merchant, err := app.Merchants.GetByID(merchantID)
+	if err != nil {
+		http.Error(w, "Error fetching merchant data", http.StatusInternalServerError)
+		return
+	}
+
+	// Re-render the entire messages page
+	data := &templateData{
+		IsAuthenticated: true,
+		Merchant:        merchant,
+		MessagesList:    messages,
+	}
+
+	app.render(w, r, http.StatusOK, "merchant.messages.page.html", data)
 }

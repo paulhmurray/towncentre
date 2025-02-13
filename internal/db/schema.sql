@@ -1,4 +1,4 @@
--- Create merchants table with automatic timestamp updates
+-- Merchants table with automatic timestamp updates
 CREATE TABLE IF NOT EXISTS merchants (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     business_name VARCHAR(255) NOT NULL,
@@ -42,3 +42,19 @@ CREATE TABLE IF NOT EXISTS products (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (merchant_id) REFERENCES merchants(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS messages (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    merchant_id BIGINT UNSIGNED NOT NULL,
+    customer_name VARCHAR(255) NOT NULL,
+    customer_email VARCHAR(255) NOT NULL,
+    customer_phone VARCHAR(50),
+    message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT false,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (merchant_id) REFERENCES merchants(id),
+    CHECK (LENGTH(message) <= 1000) -- Limit message length
+);
+

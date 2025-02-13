@@ -99,6 +99,7 @@ func main() {
 		Merchants:     merchants,
 		Products:      products,
 		Sessions:      sessionManager,
+		Messages:      &models.MessageModel{DB: db},
 	}
 	mux := http.NewServeMux()
 
@@ -142,6 +143,10 @@ func main() {
 	mux.Handle("GET /merchant/login", combinedMiddleware(app.MerchantLogin))
 	mux.Handle("POST /merchant/login", combinedMiddleware(app.MerchantLogin))
 	mux.Handle("POST /merchant/logout", combinedMiddleware(app.MerchantLogout))
+
+	mux.Handle("POST /store/{id}/message", combinedMiddleware(app.StoreMessageCreate))
+	mux.Handle("GET /merchant/messages", combinedMiddleware(app.MerchantMessages))
+	mux.Handle("POST /merchant/message/{id}/read", combinedMiddleware(app.MarkMessageAsRead))
 
 	log.Print("starting server on :4000")
 	err = http.ListenAndServe(":4000", mux)
