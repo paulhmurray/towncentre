@@ -40,3 +40,7 @@ go.work
 
 # Local development files
 tmp/
+
+# tailwind
+ui/static/css/output.css
+dist/output.css
