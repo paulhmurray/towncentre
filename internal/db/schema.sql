@@ -57,4 +57,10 @@ CREATE TABLE IF NOT EXISTS messages (
     FOREIGN KEY (merchant_id) REFERENCES merchants(id),
     CHECK (LENGTH(message) <= 1000) -- Limit message length
 );
-
+CREATE TABLE IF NOT EXISTS store_views (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    merchant_id BIGINT UNSIGNED NOT NULL,
+    viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    viewer_ip VARCHAR(45),  -- IPv6 addresses can be up to 45 chars
+    FOREIGN KEY (merchant_id) REFERENCES merchants(id)
+);

@@ -92,6 +92,8 @@ func main() {
 
 	// Initialise the product model
 	products := &models.ProductModel{DB: db}
+	// Initialis the store view model
+	storeViews := &models.StoreViewModel{DB: db}
 
 	app := &handlers.Application{
 		TemplateCache: templateCache,
@@ -100,6 +102,7 @@ func main() {
 		Products:      products,
 		Sessions:      sessionManager,
 		Messages:      &models.MessageModel{DB: db},
+		StoreViews:    storeViews,
 	}
 	mux := http.NewServeMux()
 

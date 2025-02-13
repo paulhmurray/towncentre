@@ -28,6 +28,7 @@ type Application struct {
 	Products      *models.ProductModel
 	Sessions      *scs.SessionManager
 	Messages      *models.MessageModel
+	StoreViews    *models.StoreViewModel
 }
 
 type templateData struct {
@@ -41,6 +42,7 @@ type templateData struct {
 	MessagesList       []*models.Message
 	UnreadMessageCount int
 	TotalProducts      int
+	TotalViews         int
 }
 
 // Home handler
@@ -632,6 +634,12 @@ func (app *Application) MerchantDashboard(w http.ResponseWriter, r *http.Request
 		// Don't return error, just set count to 0
 		unreadCount = 0
 	}
+	// Get total views
+	totalViews, err := app.StoreViews.GetTotalViews(merchantID)
+	if err != nil {
+		log.Printf("Error getting view count: %v", err)
+		totalViews = 0
+	}
 
 	data := &templateData{
 		IsAuthenticated:    true,
@@ -639,6 +647,7 @@ func (app *Application) MerchantDashboard(w http.ResponseWriter, r *http.Request
 		Products:           products,
 		UnreadMessageCount: unreadCount,
 		TotalProducts:      totalProducts,
+		TotalViews:         totalViews,
 	}
 
 	app.render(w, r, http.StatusOK, "merchant.dashboard.page.html", data)
@@ -709,6 +718,9 @@ func (app *Application) render(w http.ResponseWriter, r *http.Request, status in
 			}
 			if newData.TotalProducts > 0 {
 				td.TotalProducts = newData.TotalProducts
+			}
+			if newData.TotalViews > 0 {
+				td.TotalViews = newData.TotalViews
 			}
 
 			td.IsAuthenticated = td.IsAuthenticated || newData.IsAuthenticated
@@ -795,6 +807,16 @@ func (app *Application) StoreProfile(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
+	}
+	// Record the view
+	viewerIP := r.RemoteAddr
+	if forwardedFor := r.Header.Get("X-Forwarded-For"); forwardedFor != "" {
+		viewerIP = forwardedFor
+	}
+	err = app.StoreViews.RecordView(merchant.ID, viewerIP)
+	if err != nil {
+		log.Printf("Error recording view: %v", err)
+		// Don't return error to user, continue showing the page
 	}
 
 	// Get all products for this merchant
