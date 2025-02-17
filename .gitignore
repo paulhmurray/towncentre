@@ -44,3 +44,4 @@ tmp/
 # tailwind
 ui/static/css/output.css
 dist/output.css
+ui/static/css/output.css
