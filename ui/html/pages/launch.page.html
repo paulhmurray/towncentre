@@ -1,37 +1,54 @@
-{{define "title"}}Welcome to TownCentre - Ballarat's Local Marketplace{{end}}
-{{define "main"}}
+{{define "title"}}Launch TownCentre - Be the First{{end}} {{define "main"}}
+<div class="flex items-center space-x-2">
+  <!-- Logo Icon -->
+  <svg
+    class="h-8 w-8 text-indigo-600"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M12 4v12m0 0l-6-4h12l-6 4m-6 2c0 .5 2 1 6 1s6-.5 6-1"
+    />
+  </svg>
+  <!-- Wordmark -->
+  <span class="text-2xl font-bold text-gray-900"
+    ><span class="text-indigo-600">T</span>own<span class="text-indigo-600"
+      >C</span
+    >entre</span
+  >
+</div>
 <div class="bg-white">
   <!-- Hero Section -->
   <div class="relative">
-    <!-- Background image container -->
     <div class="absolute inset-0">
       <img
         src="/assets/lake_wendouree.jpg"
         alt="Ballarat"
         class="w-full h-full object-cover"
       />
-      <!-- Dark overlay for better text readability -->
       <div
         class="absolute inset-0 bg-indigo-600 mix-blend-multiply opacity-90"
       ></div>
     </div>
-
-    <!-- Content -->
     <div class="relative px-6 py-16">
       <div class="max-w-3xl mx-auto text-center text-white">
         <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
-          Launch Your Business in Ballarat's Digital Marketplace
+          Be the First to Launch Your Store in Ballarat
         </h1>
         <p class="mt-6 text-lg leading-8">
-          Join TownCentre and be among the first local businesses to reach
-          customers online. No website needed, no technical experience required.
+          Join TownCentre’s pre-launch phase—set up your online store for free
+          and reach Ballarat customers when we go live. No tech skills needed.
         </p>
         <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
           <a
             href="/merchant/register"
             class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 shadow-md"
           >
-            Start Your Business
+            Claim Your Store Now
             <svg
               class="ml-2 -mr-1 h-5 w-5"
               xmlns="http://www.w3.org/2000/svg"
@@ -48,11 +65,10 @@
             </svg>
           </a>
           <a
-            href="/merchant/login"
+            href="mailto:support@towncentre.com.au"
             class="inline-flex items-center px-6 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white hover:text-indigo-800"
+            >Learn More</a
           >
-            Sign In
-          </a>
         </div>
       </div>
     </div>
@@ -61,13 +77,12 @@
   <!-- Benefits Section -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
     <div class="text-center mb-16">
-      <h2 class="p-4 text-3xl font-bold text-gray-900">Why Join TownCentre?</h2>
+      <h2 class="p-4 text-3xl font-bold text-gray-900">Why Join Early?</h2>
       <p class="mt-4 text-lg text-gray-600">
-        Everything you need to start selling online in Ballarat
+        Get a head start with Ballarat’s new marketplace.
       </p>
     </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       <div class="bg-white p-6 rounded-lg shadow-md border">
         <div class="text-indigo-600 mb-4">
           <svg
@@ -84,13 +99,11 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-medium text-gray-900 mb-2">Quick Start</h3>
+        <h3 class="text-xl font-medium text-gray-900 mb-2">Quick Setup</h3>
         <p class="text-gray-600">
-          Set up your online store in minutes. No technical skills needed, no
-          website required.
+          Build your store in minutes—no website or tech skills needed.
         </p>
       </div>
-
       <div class="bg-white p-6 rounded-lg shadow-md border">
         <div class="text-indigo-600 mb-4">
           <svg
@@ -107,12 +120,11 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-medium text-gray-900 mb-2">Local Community</h3>
+        <h3 class="text-xl font-medium text-gray-900 mb-2">Local Buyers</h3>
         <p class="text-gray-600">
-          Connect with Ballarat customers who want to support local businesses.
+          Reach Ballarat customers eager to shop local.
         </p>
       </div>
-
       <div class="bg-white p-6 rounded-lg shadow-md border">
         <div class="text-indigo-600 mb-4">
           <svg
@@ -129,28 +141,52 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-medium text-gray-900 mb-2">Low Risk</h3>
-        <p class="text-gray-600">
-          Test your business idea with minimal investment. Only pay for what you
-          need.
-        </p>
+        <h3 class="text-xl font-medium text-gray-900 mb-2">Zero Risk</h3>
+        <p class="text-gray-600">Free to join now—only pay when sales start.</p>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow-md border">
+        <div class="text-indigo-600 mb-4">
+          <svg
+            class="h-8 w-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+        <h3 class="text-xl font-medium text-gray-900 mb-2">Early Advantage</h3>
+        <p class="text-gray-600">Be featured when we launch to shoppers.</p>
       </div>
     </div>
 
     <!-- CTA Section -->
     <div class="mt-16 text-center">
       <h2 class="p-4 text-2xl font-bold text-gray-900 mb-4">
-        Ready to Get Started?
+        Ready to Be First?
       </h2>
-      <p class="text-lg text-gray-600 mb-8">
-        Join the digital transformation of Ballarat's local economy.
+      <p class="text-lg text-gray-600 mb-4">
+        Reserve your spot in Ballarat’s digital marketplace—free until launch.
       </p>
       <a
         href="/merchant/register"
         class="p-4 inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 shadow-md"
       >
-        Open Your Store
+        Open Your Store Now
       </a>
+      <p class="mt-4 text-sm text-gray-500">
+        Built by a Ballarat local. Questions?
+        <a
+          href="mailto:support@towncentre.com.au"
+          class="text-indigo-600 hover:text-indigo-800"
+          >Email us</a
+        >.
+      </p>
     </div>
   </div>
 </div>

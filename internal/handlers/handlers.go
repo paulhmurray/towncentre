@@ -489,26 +489,80 @@ func (app *Application) MerchantRegister(w http.ResponseWriter, r *http.Request)
 		email := r.PostForm.Get("email")
 		phone := r.PostForm.Get("phone")
 		businessType := r.PostForm.Get("business-type")
+		otherBusinessType := r.PostForm.Get("other-business-type") // New field
 		password := r.PostForm.Get("password")
 		passwordConfirm := r.PostForm.Get("password-confirm")
 
+		// If "other" is selected and a custom type is provided, use it
+		if businessType == "other" && otherBusinessType != "" {
+			businessType = otherBusinessType
+		}
+
+		// Validate required fields
 		if businessName == "" || email == "" || businessType == "" || password == "" {
+			if r.Header.Get("HX-Request") == "true" {
+				w.Write([]byte(`
+                    <div class="rounded-md bg-red-50 p-4 mt-4">
+                        <div class="flex">
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Registration Failed</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <p>Please fill in all required fields.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `))
+				return
+			}
 			http.Error(w, "Please fill in all required fields", http.StatusBadRequest)
 			return
 		}
 
 		if password != passwordConfirm {
+			if r.Header.Get("HX-Request") == "true" {
+				w.Write([]byte(`
+                    <div class="rounded-md bg-red-50 p-4 mt-4">
+                        <div class="flex">
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Registration Failed</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <p>Passwords do not match.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `))
+				return
+			}
 			http.Error(w, "Passwords do not match", http.StatusBadRequest)
 			return
 		}
 
+		// Insert the merchant with the resolved businessType
 		err = app.Merchants.Insert(businessName, email, phone, businessType, password)
 		if err != nil {
 			log.Printf("Error registering merchant: %v", err)
+			if r.Header.Get("HX-Request") == "true" {
+				w.Write([]byte(`
+                    <div class="rounded-md bg-red-50 p-4 mt-4">
+                        <div class="flex">
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Registration Failed</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <p>Error creating account. Please try again later.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `))
+				return
+			}
 			http.Error(w, "Error creating account", http.StatusInternalServerError)
 			return
 		}
 
+		// Success response
 		if r.Header.Get("HX-Request") == "true" {
 			w.Write([]byte(`
                 <div class="rounded-md bg-green-50 p-4">
@@ -1107,4 +1161,26 @@ func (app *Application) MarkMessageAsRead(w http.ResponseWriter, r *http.Request
 	)
 
 	w.Write([]byte(html))
+}
+
+// Terms renders the Terms of Service page
+func (app *Application) Terms(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, http.StatusOK, "merchant.terms.page.html", nil)
+}
+
+// CheckBusinessType handles the HTMX request to show/hide the "Other" text field
+func (app *Application) CheckBusinessType(w http.ResponseWriter, r *http.Request) {
+	businessType := r.URL.Query().Get("business-type")
+	if businessType == "other" {
+		// Return the text field
+		fmt.Fprint(w, `
+			<div id="other-business-type-container" class="">
+				<label for="other-business-type" class="block text-sm font-medium text-gray-700">Please specify your business type</label>
+				<input type="text" name="other-business-type" id="other-business-type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+			</div>
+		`)
+	} else {
+		// Return an empty hidden div
+		fmt.Fprint(w, `<div id="other-business-type-container" class="hidden"></div>`)
+	}
 }

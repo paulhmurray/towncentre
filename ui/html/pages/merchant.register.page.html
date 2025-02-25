@@ -129,7 +129,6 @@
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
           </div>
-
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700"
               >Email</label
@@ -156,7 +155,6 @@
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
           </div>
-
           <div>
             <label
               for="password-confirm"
@@ -171,7 +169,6 @@
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
           </div>
-
           <div>
             <label for="phone" class="block text-sm font-medium text-gray-700"
               >Phone (optional)</label
@@ -183,7 +180,6 @@
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
           </div>
-
           <div>
             <label
               for="business-type"
@@ -194,6 +190,9 @@
               name="business-type"
               id="business-type"
               required
+              hx-get="/merchant/check-business-type"
+              hx-target="#other-business-type-container"
+              hx-swap="outerHTML"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4"
             >
               <option value="">Select a category</option>
@@ -201,7 +200,18 @@
               <option value="retail">Retail</option>
               <option value="services">Services</option>
               <option value="crafts">Local Crafts</option>
+              <option value="health">Health & Wellness</option>
+              <option value="arts">Creative Arts</option>
+              <option value="home">Home & Garden</option>
+              <option value="other">Other</option>
             </select>
+          </div>
+          <div
+            id="other-business-type-container"
+            class="hidden"
+            hx-swap-oob="true"
+          >
+            <!-- This gets replaced by the HTMX response -->
           </div>
         </div>
 
@@ -223,13 +233,13 @@
               </label>
               <p class="text-gray-500">
                 By creating an account, you agree to our
-                <button
-                  type="button"
+                <a
+                  href="/terms"
+                  target="_blank"
                   class="text-indigo-600 hover:text-indigo-800"
-                  onclick="document.getElementById('terms-modal').classList.remove('hidden')"
                 >
                   Terms of Service
-                </button>
+                </a>
                 , including our approach to dispute resolution, liability
                 limitations, and merchant obligations.
               </p>
