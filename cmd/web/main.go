@@ -153,7 +153,7 @@ func main() {
 	mux.Handle("POST /merchant/message/{id}/read", combinedMiddleware(app.MarkMessageAsRead))
 
 	// no auth required for Terms, minimal middleware for CheckBusinessType)
-	mux.Handle("GET /terms", sessionManager.LoadAndSave(http.HandlerFunc(app.Terms))) // No auth needed
+	mux.Handle("GET /terms", combinedMiddleware(app.Terms)) // No auth needed
 	mux.Handle("GET /merchant/check-business-type", sessionManager.LoadAndSave(http.HandlerFunc(app.CheckBusinessType)))
 
 	log.Print("starting server on :4000")
