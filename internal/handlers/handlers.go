@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -1165,6 +1166,9 @@ func (app *Application) MarkMessageAsRead(w http.ResponseWriter, r *http.Request
 
 // Terms renders the Terms of Service page
 func (app *Application) Terms(w http.ResponseWriter, r *http.Request) {
+	// Add debug logging
+	log.Printf("Attempting to render terms page, current template cache keys: %v",
+		reflect.ValueOf(app.TemplateCache).MapKeys())
 	app.render(w, r, http.StatusOK, "merchant.terms.page.html", nil)
 }
 
