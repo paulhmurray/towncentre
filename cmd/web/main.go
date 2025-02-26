@@ -116,6 +116,7 @@ func main() {
 	// Routes with combined middleware
 	mux.Handle("GET /{$}", combinedMiddleware(app.Home))
 	mux.Handle("GET /launch", combinedMiddleware(app.Launch))
+	mux.Handle("GET /tos", combinedMiddleware(app.ToS))
 	mux.Handle("GET /product/view/{id}", combinedMiddleware(app.ProductView))
 	mux.Handle("GET /merchant/product/view", combinedMiddleware(app.MerchantProductView))
 	mux.Handle("GET /merchant/product/create", combinedMiddleware(app.MerchantProductCreate))
@@ -153,7 +154,7 @@ func main() {
 	mux.Handle("POST /merchant/message/{id}/read", combinedMiddleware(app.MarkMessageAsRead))
 
 	// no auth required for Terms, minimal middleware for CheckBusinessType)
-	mux.Handle("GET /terms", combinedMiddleware(app.Terms)) // No auth needed
+	mux.Handle("GET /terms", combinedMiddleware(app.Terms))
 	mux.Handle("GET /merchant/check-business-type", sessionManager.LoadAndSave(http.HandlerFunc(app.CheckBusinessType)))
 
 	log.Print("starting server on :4000")

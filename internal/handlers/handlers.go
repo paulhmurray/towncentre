@@ -76,6 +76,11 @@ func (app *Application) Launch(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, http.StatusOK, "launch.page.html", nil)
 }
 
+// Terms of Service(ToS)
+func (app *Application) ToS(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, http.StatusOK, "tos.page.html", nil)
+}
+
 // ProductView handler
 func (app *Application) ProductView(w http.ResponseWriter, r *http.Request) {
 	log.Printf("ProductView - URL Path: %s", r.URL.Path)
