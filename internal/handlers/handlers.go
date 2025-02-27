@@ -914,6 +914,25 @@ func (app *Application) StoreSettings(w http.ResponseWriter, r *http.Request) {
 
 	app.render(w, r, http.StatusOK, "merchant.settings.page.html", data)
 }
+func (app *Application) MerchantOrders(w http.ResponseWriter, r *http.Request) {
+	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
+	if !ok {
+		http.Redirect(w, r, "/merchant/login", http.StatusSeeOther)
+		return
+	}
+	merchant, err := app.Merchants.GetByID(merchantID)
+	if err != nil {
+		log.Printf("Error fetching merchant: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	data := &templateData{
+		IsAuthenticated: true,
+		Merchant:        merchant,
+	}
+	app.render(w, r, http.StatusOK, "merchant.orders.page.html", data)
+}
 
 func (app *Application) StoreSettingsPost(w http.ResponseWriter, r *http.Request) {
 	// Get the merchant ID from the session

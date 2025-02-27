@@ -135,6 +135,9 @@ func main() {
 	mux.Handle("GET /merchant/settings", combinedMiddleware(app.StoreSettings))
 	mux.Handle("POST /merchant/settings", combinedMiddleware(app.StoreSettingsPost))
 
+	// Orders
+	mux.Handle("GET /merchant/orders", combinedMiddleware(app.MerchantOrders))
+
 	// Static file servers (no middleware needed)
 	mux.Handle("GET /assets/", http.StripPrefix("/assets", assetsServer))
 	mux.Handle("GET /static/", http.StripPrefix("/static", staticServer))
