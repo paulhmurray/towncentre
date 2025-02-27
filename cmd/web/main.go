@@ -125,6 +125,7 @@ func main() {
 	mux.Handle("GET /merchant/product/edit/{id}", combinedMiddleware(app.MerchantProductEdit))
 	mux.Handle("POST /merchant/product/edit/{id}", combinedMiddleware(app.MerchantProductEditPost))
 	mux.Handle("DELETE /merchant/product/delete/{id}", combinedMiddleware(app.MerchantProductDelete))
+	mux.Handle("GET /learn", combinedMiddleware(app.Learn))
 
 	// For now, just Ballarat
 	// In the future, this would become:

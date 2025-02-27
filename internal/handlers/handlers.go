@@ -1202,3 +1202,6 @@ func (app *Application) CheckBusinessType(w http.ResponseWriter, r *http.Request
 		fmt.Fprint(w, `<div id="other-business-type-container" class="hidden"></div>`)
 	}
 }
+func (app *Application) Learn(w http.ResponseWriter, r *http.Request) {
+	app.render(w, r, http.StatusOK, "learn.page.html", nil)
+}
