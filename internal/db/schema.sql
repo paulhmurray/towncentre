@@ -64,3 +64,15 @@ CREATE TABLE IF NOT EXISTS store_views (
     viewer_ip VARCHAR(45),  -- IPv6 addresses can be up to 45 chars
     FOREIGN KEY (merchant_id) REFERENCES merchants(id)
 );
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    merchant_id BIGINT UNSIGNED NOT NULL,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    expires_at TIMESTAMP NOT NULL,
+    used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (merchant_id) REFERENCES merchants(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Index for faster token lookups
+CREATE INDEX IF NOT EXISTS idx_reset_token ON password_reset_tokens(token);

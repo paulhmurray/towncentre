@@ -156,6 +156,12 @@ func main() {
 	mux.Handle("GET /merchant/messages", combinedMiddleware(app.MerchantMessages))
 	mux.Handle("POST /merchant/message/{id}/read", combinedMiddleware(app.MarkMessageAsRead))
 
+	// Forgot password routes with combined middleware
+	mux.Handle("GET /forgot-password", combinedMiddleware(app.ForgotPassword))
+	mux.Handle("POST /forgot-password", combinedMiddleware(app.ForgotPassword))
+	mux.Handle("GET /reset-password/{token}", combinedMiddleware(app.ResetPassword))
+	mux.Handle("POST /reset-password/{token}", combinedMiddleware(app.ResetPassword))
+
 	// no auth required for Terms, minimal middleware for CheckBusinessType)
 	mux.Handle("GET /terms", combinedMiddleware(app.Terms))
 	mux.Handle("GET /merchant/check-business-type", sessionManager.LoadAndSave(http.HandlerFunc(app.CheckBusinessType)))

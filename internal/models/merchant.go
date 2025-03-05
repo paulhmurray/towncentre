@@ -1,7 +1,9 @@
 package models
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -23,6 +25,16 @@ type Merchant struct {
 	OpeningHours string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+}
+
+// PasswordResetToken struct
+type PasswordResetToken struct {
+	ID         int64
+	MerchantID int64
+	Token      string
+	ExpiresAt  time.Time
+	Used       bool
+	CreatedAt  time.Time
 }
 
 type MerchantModel struct {
@@ -336,4 +348,111 @@ func (m *MerchantModel) GetFeatured() ([]*Merchant, error) {
 	}
 
 	return merchants, nil
+}
+func (m *MerchantModel) InitiatePasswordReset(email string) (*PasswordResetToken, error) {
+	// Find merchant by email
+	var merchantID int64
+	err := m.DB.QueryRow("SELECT id FROM merchants WHERE email = ?", email).Scan(&merchantID)
+	if err == sql.ErrNoRows {
+		return nil, nil // Merchant not found
+	} else if err != nil {
+		return nil, fmt.Errorf("error finding merchant: %v", err)
+	}
+
+	// Generate secure token
+	token, err := generateToken()
+	if err != nil {
+		return nil, fmt.Errorf("error generating token: %v", err)
+	}
+
+	// Set expiration (1 hour from now)
+	expiresAt := time.Now().Add(1 * time.Hour)
+
+	// Insert reset token
+	stmt := `
+        INSERT INTO password_reset_tokens (merchant_id, token, expires_at, created_at)
+        VALUES (?, ?, ?, NOW())`
+	result, err := m.DB.Exec(stmt, merchantID, token, expiresAt)
+	if err != nil {
+		return nil, fmt.Errorf("error inserting reset token: %v", err)
+	}
+
+	resetID, err := result.LastInsertId()
+	if err != nil {
+		return nil, fmt.Errorf("error getting reset token ID: %v", err)
+	}
+
+	return &PasswordResetToken{
+		ID:         resetID,
+		MerchantID: merchantID,
+		Token:      token,
+		ExpiresAt:  expiresAt,
+		Used:       false,
+		CreatedAt:  time.Now(),
+	}, nil
+}
+
+// New method to verify and reset password
+func (m *MerchantModel) ResetPassword(token, newPassword string) error {
+	// Verify token
+	var resetToken PasswordResetToken
+	stmt := `
+        SELECT id, merchant_id, token, expires_at, used, created_at
+        FROM password_reset_tokens
+        WHERE token = ? AND used = FALSE AND expires_at > NOW()`
+	err := m.DB.QueryRow(stmt, token).Scan(
+		&resetToken.ID,
+		&resetToken.MerchantID,
+		&resetToken.Token,
+		&resetToken.ExpiresAt,
+		&resetToken.Used,
+		&resetToken.CreatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return fmt.Errorf("invalid or expired token")
+	} else if err != nil {
+		return fmt.Errorf("error verifying token: %v", err)
+	}
+
+	// Hash new password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), 12)
+	if err != nil {
+		return fmt.Errorf("error hashing password: %v", err)
+	}
+
+	// Start transaction
+	tx, err := m.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("error starting transaction: %v", err)
+	}
+	defer tx.Rollback()
+
+	// Update merchant password
+	_, err = tx.Exec("UPDATE merchants SET password_hash = ?, updated_at = NOW() WHERE id = ?",
+		hashedPassword, resetToken.MerchantID)
+	if err != nil {
+		return fmt.Errorf("error updating password: %v", err)
+	}
+
+	// Mark token as used
+	_, err = tx.Exec("UPDATE password_reset_tokens SET used = TRUE WHERE id = ?", resetToken.ID)
+	if err != nil {
+		return fmt.Errorf("error marking token as used: %v", err)
+	}
+
+	// Commit transaction
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("error committing transaction: %v", err)
+	}
+
+	return nil
+}
+
+// Helper function to generate secure token
+func generateToken() (string, error) {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
 }

@@ -43,6 +43,7 @@ type templateData struct {
 	UnreadMessageCount int
 	TotalProducts      int
 	TotalViews         int
+	Token              string
 }
 
 // Home handler
@@ -776,7 +777,9 @@ func (app *Application) render(w http.ResponseWriter, r *http.Request, status in
 			if newData.TotalViews > 0 {
 				td.TotalViews = newData.TotalViews
 			}
-
+			if newData.Token != "" {
+				td.Token = newData.Token
+			}
 			td.IsAuthenticated = td.IsAuthenticated || newData.IsAuthenticated
 		}
 	}
@@ -1204,4 +1207,156 @@ func (app *Application) CheckBusinessType(w http.ResponseWriter, r *http.Request
 }
 func (app *Application) Learn(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, http.StatusOK, "learn.page.html", nil)
+}
+func (app *Application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		err := r.ParseForm()
+		if err != nil {
+			app.handleError(w, r, "Invalid form data", http.StatusBadRequest)
+			return
+		}
+
+		email := r.PostForm.Get("email")
+		if email == "" {
+			app.handleError(w, r, "Please enter your email", http.StatusUnprocessableEntity)
+			return
+		}
+
+		resetToken, err := app.Merchants.InitiatePasswordReset(email)
+		if err != nil {
+			log.Printf("Error initiating password reset: %v", err)
+			app.handleError(w, r, "An error occurred while processing your request", http.StatusInternalServerError)
+			return
+		}
+		if resetToken == nil {
+			app.handleError(w, r, "Email not found", http.StatusUnprocessableEntity)
+			return
+		}
+
+		if err := sendResetEmail(email, resetToken.Token); err != nil {
+			log.Printf("Error sending reset email: %v", err)
+			app.handleError(w, r, "Error sending reset email", http.StatusInternalServerError)
+			return
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			w.Write([]byte(`
+                <div class="rounded-md bg-green-50 p-4">
+                    <div class="flex">
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-green-800">Reset Link Sent</h3>
+                            <div class="mt-2 text-sm text-green-700">
+                                <p>Please check your email for the password reset link.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `))
+			return
+		}
+
+		data := &templateData{
+			Error: "Password reset link sent to your email",
+		}
+		app.render(w, r, http.StatusOK, "merchant.forgot-password.page.html", data) // Template name unchanged for now
+		return
+	}
+
+	app.render(w, r, http.StatusOK, "merchant.forgot-password.page.html", nil)
+}
+
+// ResetPassword handler
+func (app *Application) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	parts := strings.Split(path, "/")
+	if len(parts) < 3 || parts[1] != "reset-password" {
+		http.NotFound(w, r)
+		return
+	}
+	token := parts[2]
+
+	if r.Method == http.MethodPost {
+		err := r.ParseForm()
+		if err != nil {
+			app.handleError(w, r, "Invalid form data", http.StatusBadRequest)
+			return
+		}
+
+		password := r.PostForm.Get("password")
+		passwordConfirm := r.PostForm.Get("password-confirm")
+
+		if password == "" || passwordConfirm == "" {
+			app.handleError(w, r, "Please enter and confirm your new password", http.StatusUnprocessableEntity)
+			return
+		}
+
+		if password != passwordConfirm {
+			app.handleError(w, r, "Passwords do not match", http.StatusUnprocessableEntity)
+			return
+		}
+
+		err = app.Merchants.ResetPassword(token, password)
+		if err != nil {
+			log.Printf("Error resetting password: %v", err)
+			app.handleError(w, r, err.Error(), http.StatusUnprocessableEntity)
+			return
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/merchant/login")
+			w.Write([]byte(`
+                <div class="rounded-md bg-green-50 p-4">
+                    <div class="flex">
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-green-800">Password Reset Successful</h3>
+                            <div class="mt-2 text-sm text-green-700">
+                                <p>You can now log in with your new password.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `))
+			return
+		}
+
+		http.Redirect(w, r, "/merchant/login", http.StatusSeeOther)
+		return
+	}
+
+	data := &templateData{
+		Token: token,
+	}
+	app.render(w, r, http.StatusOK, "merchant.reset-password.page.html", data)
+}
+
+// Helper function to handle errors consistently
+func (app *Application) handleError(w http.ResponseWriter, r *http.Request, message string, status int) {
+	if r.Header.Get("HX-Request") == "true" {
+		w.Write([]byte(fmt.Sprintf(`
+            <div class="rounded-md bg-red-50 p-4">
+                <div class="flex">
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Error</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <p>%s</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `, message)))
+		return
+	}
+
+	data := &templateData{
+		Error: message,
+	}
+	app.render(w, r, status, "merchant.forgot-password.page.html", data)
+}
+
+// could this be in a separate utility file
+func sendResetEmail(email, token string) error {
+	// Implement your email sending logic here
+	// Example URL: http://yourdomain.com/reset-password/{token}
+	log.Printf("Sending reset email to %s with token %s", email, token)
+	return nil // Replace with actual email sending implementation
 }
