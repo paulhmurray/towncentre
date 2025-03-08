@@ -563,24 +563,29 @@ func (app *Application) MerchantRegister(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		// Success response
-		if r.Header.Get("HX-Request") == "true" {
-			w.Write([]byte(`
-                <div class="rounded-md bg-green-50 p-4">
-                    <div class="flex">
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-green-800">Registration Successful</h3>
-                            <div class="mt-2 text-sm text-green-700">
-                                <p>Your account has been created. <a href="/merchant/login" class="font-medium text-green-800 hover:text-green-900">Log in</a></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `))
+		// After successful registration, authenticate the user
+		merchant, err := app.Merchants.Authenticate(email, password)
+		if err != nil {
+			log.Printf("Error authenticating new merchant: %v", err)
+			// Fall back to redirecting to login page if automatic login fails
+			if r.Header.Get("HX-Request") == "true" {
+				w.Header().Set("HX-Redirect", "/merchant/login")
+				return
+			}
+			http.Redirect(w, r, "/merchant/login", http.StatusSeeOther)
 			return
 		}
 
-		http.Redirect(w, r, "/merchant/login", http.StatusSeeOther)
+		// Set the merchant ID in the session
+		app.Sessions.Put(r.Context(), "merchantID", merchant.ID)
+
+		// Redirect to the dashboard
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/merchant/dashboard")
+			return
+		}
+
+		http.Redirect(w, r, "/merchant/dashboard", http.StatusSeeOther)
 	}
 }
 
