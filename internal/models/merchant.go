@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -469,57 +470,80 @@ func generateToken() (string, error) {
 
 // InsertDefaultVouchers adds three default voucher products to a new merchant account
 func (m *MerchantModel) InsertDefaultVouchers(merchantID int64, products *ProductModel) error {
+	log.Printf("Starting InsertDefaultVouchers for merchant ID: %d", merchantID)
+
+	// Begin a transaction to ensure all vouchers are created or none
+	tx, err := m.DB.Begin()
+	if err != nil {
+		log.Printf("Error starting transaction: %v", err)
+		return fmt.Errorf("error starting transaction: %v", err)
+	}
+	defer tx.Rollback()
+
+	// Direct SQL insert statement
+	stmt := `
+		INSERT INTO products (
+			merchant_id, name, description, price, category,
+			image_path, thumbnail_path, has_delivery, has_pickup,
+			created_at, updated_at
+		) VALUES (?, ?, ?, ?, ?, ?, ?, TRUE, TRUE, NOW(), NOW())`
+
 	// Create the three voucher products with predefined values
 	vouchers := []struct {
 		name        string
 		description string
 		price       float64
-		imagePath   string
 	}{
 		{
 			name:        "$25 Gift Voucher",
 			description: "A $25 gift voucher that can be redeemed in-store or online. The perfect gift for any occasion!",
 			price:       25.00,
-			imagePath:   "/static/images/vouchers/voucher.png",
 		},
 		{
 			name:        "$50 Gift Voucher",
 			description: "A $50 gift voucher that can be redeemed in-store or online. The perfect gift for any occasion!",
 			price:       50.00,
-			imagePath:   "/static/images/vouchers/voucher.png",
 		},
 		{
 			name:        "$100 Gift Voucher",
 			description: "A $100 gift voucher that can be redeemed in-store or online. The perfect gift for any occasion!",
 			price:       100.00,
-			imagePath:   "/static/images/vouchers/voucher.png",
 		},
 	}
 
-	// Insert each voucher using the ProductModel
-	for _, v := range vouchers {
-		// Create a local copy of the path string to get a stable address
-		imagePath := v.imagePath
+	// Common image path for all vouchers
+	imagePath := "/static/images/vouchers/voucher.png"
+	log.Printf("Using image path: %s", imagePath)
 
-		// Create a product object
-		product := &Product{
-			MerchantID:    merchantID,
-			Name:          v.name,
-			Description:   v.description,
-			Price:         v.price,
-			Category:      "voucher",
-			ImagePath:     &imagePath,
-			ThumbnailPath: &imagePath,
-			HasDelivery:   true,
-			HasPickup:     true,
-		}
+	// Insert each voucher
+	for i, v := range vouchers {
+		log.Printf("Inserting voucher %d: %s with image path %s", i+1, v.name, imagePath)
 
-		// Use the product model's Insert method
-		err := products.Insert(product)
+		// Execute SQL with hardcoded string values directly
+		_, err := tx.Exec(stmt,
+			merchantID,
+			v.name,
+			v.description,
+			v.price,
+			"voucher",
+			imagePath, // image_path as direct string
+			imagePath) // thumbnail_path as direct string
+
 		if err != nil {
+			log.Printf("Error inserting voucher %d: %v", i+1, err)
 			return fmt.Errorf("error inserting voucher %s: %v", v.name, err)
 		}
+
+		log.Printf("Successfully inserted voucher %d", i+1)
 	}
 
+	// Commit the transaction
+	if err = tx.Commit(); err != nil {
+		log.Printf("Error committing transaction: %v", err)
+		return fmt.Errorf("error committing transaction: %v", err)
+	}
+
+	log.Printf("Successfully inserted all vouchers for merchant ID: %d", merchantID)
 	return nil
 }
+

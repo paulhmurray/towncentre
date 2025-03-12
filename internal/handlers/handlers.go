@@ -563,8 +563,8 @@ func (app *Application) MerchantRegister(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		// Create default vouchers for the new merchant
-		err = app.CreateDefaultVouchers(merchantID)
+		// Create default vouchers for the new merchant using the merchant model's function
+		err = app.Merchants.InsertDefaultVouchers(merchantID, app.Products)
 		if err != nil {
 			log.Printf("Warning: Failed to create default vouchers for merchant %d: %v", merchantID, err)
 			// Continue with registration even if voucher creation fails
@@ -594,71 +594,6 @@ func (app *Application) MerchantRegister(w http.ResponseWriter, r *http.Request)
 
 		http.Redirect(w, r, "/merchant/dashboard", http.StatusSeeOther)
 	}
-}
-
-// CreateDefaultVouchers adds three default voucher products to a new merchant account
-func (app *Application) CreateDefaultVouchers(merchantID int64) error {
-	// Create the three voucher products with predefined values
-	vouchers := []struct {
-		name        string
-		description string
-		price       float64
-		category    string
-	}{
-		{
-			name:        "$25 Gift Voucher",
-			description: "A $25 gift voucher that can be redeemed in-store or online. The perfect gift for any occasion!",
-			price:       25.00,
-			category:    "voucher",
-		},
-		{
-			name:        "$50 Gift Voucher",
-			description: "A $50 gift voucher that can be redeemed in-store or online. The perfect gift for any occasion!",
-			price:       50.00,
-			category:    "voucher",
-		},
-		{
-			name:        "$100 Gift Voucher",
-			description: "A $100 gift voucher that can be redeemed in-store or online. The perfect gift for any occasion!",
-			price:       100.00,
-			category:    "voucher",
-		},
-	}
-
-	// Begin a transaction to ensure all vouchers are created or none
-	tx, err := app.DB.Begin()
-	if err != nil {
-		return fmt.Errorf("error starting transaction: %v", err)
-	}
-	defer tx.Rollback()
-
-	// Insert each voucher
-	stmt := `
-        INSERT INTO products (
-            merchant_id, name, description, price, category, 
-            has_delivery, has_pickup, 
-            created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, TRUE, TRUE, NOW(), NOW())`
-
-	for _, v := range vouchers {
-		_, err := tx.Exec(stmt,
-			merchantID,
-			v.name,
-			v.description,
-			v.price,
-			v.category)
-
-		if err != nil {
-			return fmt.Errorf("error inserting voucher %s: %v", v.name, err)
-		}
-	}
-
-	// Commit the transaction
-	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("error committing transaction: %v", err)
-	}
-
-	return nil
 }
 
 // MerchantLogin handler

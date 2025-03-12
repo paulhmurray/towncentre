@@ -29,6 +29,8 @@ type ProductModel struct {
 }
 
 func (m *ProductModel) Insert(p *Product) error {
+	log.Printf("ProductModel.Insert called for product: %s", p.Name)
+	
 	stmt := `
         INSERT INTO products (
             merchant_id, name, description, price, category, 
@@ -39,24 +41,37 @@ func (m *ProductModel) Insert(p *Product) error {
 	var imagePath, thumbnailPath *string
 	if p.ImagePath != nil {
 		imagePath = p.ImagePath
+		log.Printf("Using image path: %s", *imagePath)
+	} else {
+		log.Printf("No image path provided")
 	}
 	if p.ThumbnailPath != nil {
 		thumbnailPath = p.ThumbnailPath
+		log.Printf("Using thumbnail path: %s", *thumbnailPath)
+	} else {
+		log.Printf("No thumbnail path provided")
 	}
+	
+	log.Printf("Executing SQL with parameters - MerchantID: %d, Name: %s, Category: %s, ImagePath: %v, ThumbnailPath: %v",
+		p.MerchantID, p.Name, p.Category, imagePath, thumbnailPath)
+	
 	result, err := m.DB.Exec(stmt,
 		p.MerchantID, p.Name, p.Description, p.Price,
 		p.Category, imagePath, thumbnailPath,
 		p.HasDelivery, p.HasPickup)
 	if err != nil {
+		log.Printf("Error executing SQL: %v", err)
 		return err
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
+		log.Printf("Error getting last insert ID: %v", err)
 		return err
 	}
 
 	p.ID = id
+	log.Printf("Product %s inserted with ID: %d", p.Name, p.ID)
 	return nil
 }
 
