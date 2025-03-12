@@ -42,11 +42,11 @@ type MerchantModel struct {
 }
 
 // Insert adds a new merchant to the database
-func (m *MerchantModel) Insert(businessName, email, phone, businessType, password string) error {
+func (m *MerchantModel) Insert(businessName, email, phone, businessType, password string) (int64, error) {
 	// Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// Generate store slug from business name
@@ -63,7 +63,7 @@ func (m *MerchantModel) Insert(businessName, email, phone, businessType, passwor
 		).Scan(&exists)
 
 		if err != nil {
-			return err
+			return 0, err
 		}
 
 		if !exists {
@@ -83,7 +83,7 @@ func (m *MerchantModel) Insert(businessName, email, phone, businessType, passwor
             created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`
 
-	_, err = m.DB.Exec(stmt,
+	result, err := m.DB.Exec(stmt,
 		businessName,   // business_name
 		businessName,   // store_name (same as business_name initially)
 		slug,           // store_slug
@@ -94,7 +94,17 @@ func (m *MerchantModel) Insert(businessName, email, phone, businessType, passwor
 		hashedPassword, // password_hash
 	)
 
-	return err
+	if err != nil {
+		return 0, err
+	}
+
+	// Get the new merchant ID
+	merchantID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return merchantID, nil
 }
 
 // Authenticate verifies a merchant's email and password
@@ -455,4 +465,61 @@ func generateToken() (string, error) {
 		return "", err
 	}
 	return base64.URLEncoding.EncodeToString(b), nil
+}
+
+// InsertDefaultVouchers adds three default voucher products to a new merchant account
+func (m *MerchantModel) InsertDefaultVouchers(merchantID int64, products *ProductModel) error {
+	// Create the three voucher products with predefined values
+	vouchers := []struct {
+		name        string
+		description string
+		price       float64
+		imagePath   string
+	}{
+		{
+			name:        "$25 Gift Voucher",
+			description: "A $25 gift voucher that can be redeemed in-store or online. The perfect gift for any occasion!",
+			price:       25.00,
+			imagePath:   "/static/images/vouchers/voucher.png",
+		},
+		{
+			name:        "$50 Gift Voucher",
+			description: "A $50 gift voucher that can be redeemed in-store or online. The perfect gift for any occasion!",
+			price:       50.00,
+			imagePath:   "/static/images/vouchers/voucher.png",
+		},
+		{
+			name:        "$100 Gift Voucher",
+			description: "A $100 gift voucher that can be redeemed in-store or online. The perfect gift for any occasion!",
+			price:       100.00,
+			imagePath:   "/static/images/vouchers/voucher.png",
+		},
+	}
+
+	// Insert each voucher using the ProductModel
+	for _, v := range vouchers {
+		// Create a local copy of the path string to get a stable address
+		imagePath := v.imagePath
+
+		// Create a product object
+		product := &Product{
+			MerchantID:    merchantID,
+			Name:          v.name,
+			Description:   v.description,
+			Price:         v.price,
+			Category:      "voucher",
+			ImagePath:     &imagePath,
+			ThumbnailPath: &imagePath,
+			HasDelivery:   true,
+			HasPickup:     true,
+		}
+
+		// Use the product model's Insert method
+		err := products.Insert(product)
+		if err != nil {
+			return fmt.Errorf("error inserting voucher %s: %v", v.name, err)
+		}
+	}
+
+	return nil
 }
