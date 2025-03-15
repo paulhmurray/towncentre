@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS merchants (
     business_name VARCHAR(255) NOT NULL,
     store_name VARCHAR(255),
     store_slug VARCHAR(255),
+    logo_path VARCHAR(255),
     region VARCHAR(50),
     description TEXT,
     email VARCHAR(255) NOT NULL UNIQUE,

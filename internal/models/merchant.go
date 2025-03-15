@@ -17,6 +17,7 @@ type Merchant struct {
 	BusinessName string
 	StoreName    string
 	StoreSlug    string
+	LogoPath     string
 	Region       string
 	Description  string
 	Email        string
@@ -113,8 +114,9 @@ func (m *MerchantModel) Authenticate(email, password string) (*Merchant, error) 
 	merchant := &Merchant{}
 	var hashedPassword []byte
 
+	var phone, logoPath sql.NullString
 	stmt := `
-        SELECT id, business_name, store_name, store_slug, region,
+        SELECT id, business_name, store_name, store_slug, logo_path, region,
                email, phone, business_type, password_hash,
                created_at, updated_at 
         FROM merchants 
@@ -125,9 +127,10 @@ func (m *MerchantModel) Authenticate(email, password string) (*Merchant, error) 
 		&merchant.BusinessName,
 		&merchant.StoreName,
 		&merchant.StoreSlug,
+		&logoPath,
 		&merchant.Region,
 		&merchant.Email,
-		&merchant.Phone,
+		&phone,
 		&merchant.BusinessType,
 		&hashedPassword,
 		&merchant.CreatedAt,
@@ -138,6 +141,12 @@ func (m *MerchantModel) Authenticate(email, password string) (*Merchant, error) 
 		return nil, nil // No matching record found
 	} else if err != nil {
 		return nil, err
+	}
+	if phone.Valid {
+		merchant.Phone = phone.String
+	}
+	if logoPath.Valid {
+		merchant.LogoPath = logoPath.String
 	}
 
 	// Check password
@@ -155,10 +164,10 @@ func (m *MerchantModel) GetByID(id int64) (*Merchant, error) {
 	merchant := &Merchant{}
 
 	// Use NullString for fields that could be NULL
-	var description, location, openingHours, phone sql.NullString
+	var description, location, openingHours, phone, logoPath sql.NullString
 
 	stmt := `
-        SELECT id, business_name, store_name, store_slug, region,
+        SELECT id, business_name, store_name, store_slug, logo_path, region,
                description, email, phone, business_type, location,
                opening_hours, created_at, updated_at 
         FROM merchants 
@@ -169,6 +178,7 @@ func (m *MerchantModel) GetByID(id int64) (*Merchant, error) {
 		&merchant.BusinessName,
 		&merchant.StoreName,
 		&merchant.StoreSlug,
+		&logoPath,
 		&merchant.Region,
 		&description, // Changed from &merchant.Description
 		&merchant.Email,
@@ -200,6 +210,9 @@ func (m *MerchantModel) GetByID(id int64) (*Merchant, error) {
 	if phone.Valid {
 		merchant.Phone = phone.String
 	}
+	if logoPath.Valid {
+		merchant.LogoPath = logoPath.String
+	}
 
 	return merchant, nil
 }
@@ -229,7 +242,7 @@ func generateSlug(name string) string {
 
 func (m *MerchantModel) GetByStoreSlugAndRegion(slug, region string) (*Merchant, error) {
 	stmt := `
-        SELECT id, business_name, store_name, store_slug, region,
+        SELECT id, business_name, store_name, store_slug, logo_path, region,
                description, email, phone, business_type, location, 
                opening_hours, created_at, updated_at
         FROM merchants
@@ -238,13 +251,14 @@ func (m *MerchantModel) GetByStoreSlugAndRegion(slug, region string) (*Merchant,
 	merchant := &Merchant{}
 
 	// Use NullString for fields that could be NULL
-	var description, location, openingHours, phone sql.NullString
+	var description, location, openingHours, phone, logoPath sql.NullString
 
 	err := m.DB.QueryRow(stmt, slug, region).Scan(
 		&merchant.ID,
 		&merchant.BusinessName,
 		&merchant.StoreName,
 		&merchant.StoreSlug,
+		&logoPath,
 		&merchant.Region,
 		&description, // Changed from &merchant.Description
 		&merchant.Email,
@@ -273,18 +287,49 @@ func (m *MerchantModel) GetByStoreSlugAndRegion(slug, region string) (*Merchant,
 	if phone.Valid {
 		merchant.Phone = phone.String
 	}
+	if logoPath.Valid {
+		merchant.LogoPath = logoPath.String
+	}
 
 	return merchant, nil
 }
 func (m *MerchantModel) UpdateStoreInfo(merchant *Merchant) error {
+	// If logo path is provided, include it in the update
+	if merchant.LogoPath != "" {
+		stmt := `
+			UPDATE merchants 
+			SET store_name = ?,
+				description = ?,
+				location = ?,
+				opening_hours = ?,
+				logo_path = ?,
+				updated_at = NOW()
+			WHERE id = ?`
+
+		_, err := m.DB.Exec(stmt,
+			merchant.StoreName,
+			merchant.Description,
+			merchant.Location,
+			merchant.OpeningHours,
+			merchant.LogoPath,
+			merchant.ID)
+
+		if err != nil {
+			return fmt.Errorf("error updating merchant with logo: %v", err)
+		}
+
+		return nil
+	}
+
+	// If no logo path is provided, use the original query
 	stmt := `
-        UPDATE merchants 
-        SET store_name = ?,
-            description = ?,
-            location = ?,
-            opening_hours = ?,
-            updated_at = NOW()
-        WHERE id = ?`
+		UPDATE merchants 
+		SET store_name = ?,
+			description = ?,
+			location = ?,
+			opening_hours = ?,
+			updated_at = NOW()
+		WHERE id = ?`
 
 	_, err := m.DB.Exec(stmt,
 		merchant.StoreName,
@@ -302,7 +347,7 @@ func (m *MerchantModel) UpdateStoreInfo(merchant *Merchant) error {
 
 func (m *MerchantModel) GetFeatured() ([]*Merchant, error) {
 	stmt := `
-        SELECT id, business_name, store_name, store_slug, region,
+        SELECT id, business_name, store_name, store_slug, logo_path, region,
                description, email, phone, business_type, location,
                opening_hours, created_at, updated_at
         FROM merchants
@@ -320,13 +365,14 @@ func (m *MerchantModel) GetFeatured() ([]*Merchant, error) {
 	for rows.Next() {
 		m := &Merchant{}
 		// Use NullString for fields that could be NULL
-		var description, location, openingHours, phone sql.NullString
+		var description, location, openingHours, phone, logoPath sql.NullString
 
 		err := rows.Scan(
 			&m.ID,
 			&m.BusinessName,
 			&m.StoreName,
 			&m.StoreSlug,
+			&logoPath,
 			&m.Region,
 			&description,
 			&m.Email,
@@ -353,6 +399,9 @@ func (m *MerchantModel) GetFeatured() ([]*Merchant, error) {
 		}
 		if phone.Valid {
 			m.Phone = phone.String
+		}
+		if logoPath.Valid {
+			m.LogoPath = logoPath.String
 		}
 
 		merchants = append(merchants, m)
@@ -546,4 +595,3 @@ func (m *MerchantModel) InsertDefaultVouchers(merchantID int64, products *Produc
 	log.Printf("Successfully inserted all vouchers for merchant ID: %d", merchantID)
 	return nil
 }
-

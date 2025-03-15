@@ -14,7 +14,13 @@
 
   <!-- Settings Form -->
   <div class="bg-white shadow sm:rounded-lg">
-    <form hx-post="/merchant/settings" hx-swap="afterend">
+    <form
+      hx-post="/merchant/settings"
+      hx-swap="afterend"
+      hx-encoding="multipart/form-data"
+      enctype="multipart/form-data"
+      class="space-y-8"
+    >
       <div class="p-6 space-y-8">
         <!-- Store Name -->
         <div class="space-y-2">
@@ -33,6 +39,58 @@
             value="{{if .Merchant.StoreName}}{{.Merchant.StoreName}}{{else}}{{.Merchant.BusinessName}}{{end}}"
             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
+        </div>
+        <!-- Store logo-->
+        <div class="my-8 border-t border-b border-gray-200 py-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Store Logo</h3>
+
+          <div class="flex items-start">
+            <div class="mr-6">
+              <!-- Logo Preview -->
+              <div
+                class="rounded-full bg-white shadow-sm overflow-hidden w-32 h-32 flex items-center justify-center border border-gray-200"
+              >
+                {{if .Merchant.LogoPath}}
+                <img
+                  id="logo-preview"
+                  src="{{.Merchant.LogoPath}}"
+                  alt="Store logo"
+                  class="w-full h-full object-cover"
+                />
+                {{else}}
+                <img
+                  id="logo-preview"
+                  src="/api/placeholder/128/128"
+                  alt="Logo preview"
+                  class="w-full h-full object-cover bg-gray-100"
+                />
+                {{end}}
+              </div>
+            </div>
+
+            <div class="flex-1">
+              <label
+                for="logo"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Upload Store Logo</label
+              >
+              <input
+                type="file"
+                name="logo"
+                id="logo"
+                accept="image/*"
+                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                onchange="previewLogo(this)"
+              />
+              <p class="mt-2 text-sm text-gray-500">
+                Upload a square image for best results. PNG, JPG or GIF up to
+                2MB.
+              </p>
+              <p class="mt-1 text-xs text-gray-500">
+                Your logo will appear in a circular frame on your store page.
+              </p>
+            </div>
+          </div>
         </div>
 
         <!-- Store Description -->
@@ -105,4 +163,17 @@
     </form>
   </div>
 </div>
+<script>
+  function previewLogo(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        document.getElementById("logo-preview").src = e.target.result;
+      };
+
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
 {{end}}

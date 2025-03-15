@@ -957,7 +957,8 @@ func (app *Application) StoreSettingsPost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err := r.ParseForm()
+	// Parse multipart form for file upload (5MB max)
+	err := r.ParseMultipartForm(5 << 20)
 	if err != nil {
 		log.Printf("Error parsing form: %v", err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -971,6 +972,44 @@ func (app *Application) StoreSettingsPost(w http.ResponseWriter, r *http.Request
 		Description:  r.PostForm.Get("description"),
 		Location:     r.PostForm.Get("location"),
 		OpeningHours: r.PostForm.Get("opening-hours"),
+	}
+
+	// Handle logo file upload
+	if file, header, err := r.FormFile("logo"); err == nil {
+		defer file.Close()
+
+		// Create unique filename
+		ext := filepath.Ext(header.Filename)
+		filename := fmt.Sprintf("%d-logo-%s%s", time.Now().UnixNano(), uuid.New().String(), ext)
+		fullPath := filepath.Join("ui/static/images/logos", filename)
+		webPath := "/static/images/logos/" + filename
+
+		log.Printf("Saving logo to: %s", fullPath)
+		log.Printf("Web path will be: %s", webPath)
+
+		// Ensure the directory exists
+		err = os.MkdirAll(filepath.Dir(fullPath), 0755)
+		if err != nil {
+			log.Printf("Error creating directory: %v", err)
+		}
+		// Create the file
+		dst, err := os.Create(fullPath)
+		if err != nil {
+			log.Printf("Error creating logo file: %v", err)
+		} else {
+			defer dst.Close()
+
+			// Copy the uploaded file
+			if _, err := io.Copy(dst, file); err != nil {
+				log.Printf("Error copying logo file: %v", err)
+			} else {
+				// Set the logo path
+				merchant.LogoPath = webPath
+				log.Printf("Logo path set to: %s", webPath)
+			}
+		}
+	} else {
+		log.Printf("No logo file received or error: %v", err)
 	}
 
 	// Update the merchant

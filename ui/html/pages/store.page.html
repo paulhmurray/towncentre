@@ -1,44 +1,80 @@
 {{define "title"}}{{.Store.StoreName}} - TownCentre{{end}} {{define "main"}}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <!-- Hero Banner -->
-  <div class="relative mb-8 rounded-xl overflow-hidden">
-    <div
-      class="h-64 bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center"
-    >
-      <div class="text-center text-white px-6 py-12 max-w-3xl">
-        <h1 class="text-4xl font-bold tracking-tight">{{.Store.StoreName}}</h1>
-        <span
-          class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white bg-opacity-20 text-white mt-3"
-        >
-          {{.Store.BusinessType}}
-        </span>
+  <!-- Store Header with Logo and Banner -->
+  <div class="flex flex-col md:flex-row gap-4 mb-8">
+    <!-- Logo Section - 1/4 width on desktop, full width and stacked on top for mobile -->
+    <div class="w-full md:w-1/4 flex justify-center items-center">
+      <div
+        class="rounded-full bg-white shadow-md overflow-hidden w-40 h-40 flex items-center justify-center border-2 border-gray-100"
+      >
+        {{if .Store.LogoPath}}
+        <img
+          src="{{.Store.LogoPath}}"
+          alt="{{.Store.StoreName}} logo"
+          class="w-full h-full object-cover"
+        />
+        {{else}}
+        <div class="text-center p-4">
+          <svg
+            class="h-16 w-16 text-gray-300 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+            />
+          </svg>
+          <p class="mt-2 text-xs text-gray-500">No logo uploaded</p>
+        </div>
+        {{end}}
       </div>
     </div>
 
-    <!-- Contact Store Button - Positioned on the banner -->
-    <div class="absolute top-4 right-4 sm:top-6 sm:right-6">
-      <button
-        onclick="document.getElementById('contact-form').classList.remove('hidden'); this.classList.add('hidden');"
-        class="flex items-center px-4 py-2 border border-white text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 bg-opacity-90 hover:bg-opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+    <!-- Banner Section - 3/4 width on desktop, full width on mobile -->
+    <div class="w-full md:w-3/4 relative">
+      <div
+        class="rounded-xl overflow-hidden h-40 md:h-64 bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center"
       >
-        <svg
-          class="h-4 w-4 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        <div class="text-center text-white px-6 py-6 md:py-12 max-w-3xl">
+          <h1 class="text-3xl md:text-4xl font-bold tracking-tight">
+            {{.Store.StoreName}}
+          </h1>
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white bg-opacity-20 text-white mt-3"
+          >
+            {{.Store.BusinessType}}
+          </span>
+        </div>
+      </div>
+
+      <!-- Contact Store Button - Repositioned for mobile compatibility -->
+      <div class="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <button
+          onclick="document.getElementById('contact-form').classList.remove('hidden'); this.classList.add('hidden');"
+          class="flex items-center px-2 py-1 sm:px-4 sm:py-2 border border-white text-xs sm:text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 bg-opacity-90 hover:bg-opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-          />
-        </svg>
-        Contact Store
-      </button>
+          <svg
+            class="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+            />
+          </svg>
+          <span>Contact</span>
+        </button>
+      </div>
     </div>
   </div>
-
   <!-- Store Information Card -->
   <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
     <div class="p-6 sm:p-8">
