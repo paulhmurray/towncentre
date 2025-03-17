@@ -950,9 +950,13 @@ func (app *Application) MerchantOrders(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Application) StoreSettingsPost(w http.ResponseWriter, r *http.Request) {
+	// Log all headers to debug the request
+	log.Printf("Received headers: %v", r.Header)
+
 	// Get the merchant ID from the session
 	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
 	if !ok {
+		log.Println("Unauthorized: No merchantID in session")
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -1020,24 +1024,22 @@ func (app *Application) StoreSettingsPost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// Log before HTMX check
+	log.Println("Reached merchant update success, checking HX-Request")
+
 	// Handle HTMX request
 	if r.Header.Get("HX-Request") == "true" {
-		w.Write([]byte(`
-            <div class="rounded-md bg-green-50 p-4">
-                <div class="flex">
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-green-800">Settings Updated Successfully</h3>
-                        <div class="mt-2 text-sm text-green-700">
-                            <p>Your store information has been updated.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `))
+		log.Println("HX-Request is true, setting HX-Redirect")
+		// Use HX-Redirect to instruct HTMX to redirect to the dashboard
+		w.Header().Set("HX-Redirect", "/merchant/dashboard")
+		w.WriteHeader(http.StatusOK)
+		log.Println("HX-Redirect set, response sent")
 		return
 	}
 
-	http.Redirect(w, r, "/merchant/settings", http.StatusSeeOther)
+	// Fallback for non-HTMX requests (e.g., JavaScript disabled)
+	log.Println("No HX-Request, performing HTTP redirect")
+	http.Redirect(w, r, "/merchant/dashboard", http.StatusSeeOther)
 }
 func (app *Application) StoreMessageCreate(w http.ResponseWriter, r *http.Request) {
 	// Parse store ID from URL

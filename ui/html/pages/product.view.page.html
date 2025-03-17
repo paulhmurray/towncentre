@@ -1,97 +1,55 @@
 {{define "title"}}{{.Product.Name}} - TownCentre{{end}} {{define "main"}}
-<div class="text-sm mb-4">
-  <a href="/" class="text-indigo-600 hover:text-indigo-900">Home</a>
-  <span class="text-gray-500 mx-2">/</span>
-  <a
-    href="/ballarat/{{.Store.StoreSlug}}"
-    class="text-indigo-600 hover:text-indigo-900"
-    >{{.Store.StoreName}}</a
-  >
-  <span class="text-gray-500 mx-2">/</span>
-  <span class="text-gray-500">{{.Product.Name}}</span>
-</div>
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
-    <!-- Image gallery -->
-    <div class="flex flex-col">
-      <div class="aspect-w-4 aspect-h-3 rounded-lg bg-gray-100 overflow-hidden">
-        {{if .Product.ImagePath}}
-        <img
-          src="{{.Product.ImagePath}}"
-          alt="{{.Product.Name}}"
-          class="object-cover object-center w-full h-full"
-        />
-        {{else}}
-        <div class="flex items-center justify-center h-full">
-          <span class="text-gray-400">No image available</span>
-        </div>
-        {{end}}
-      </div>
+<div class="relative min-h-screen bg-gray-50">
+  <!-- Hero Background -->
+  <div
+    class="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-teal-100/30 to-blue-100/30 z-0"
+  ></div>
+
+  <!-- Main Content -->
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10">
+    <!-- Breadcrumbs -->
+    <div
+      class="text-sm mb-6 flex items-center space-x-2 animate-fade-in-down"
+      style="font-family: &quot;Inter&quot;, sans-serif"
+    >
+      <a
+        href="/"
+        class="text-teal-600 hover:text-teal-700 transition-all duration-300"
+      >
+        Home
+      </a>
+      <span class="text-gray-400">/</span>
+      <a
+        href="/ballarat/{{.Store.StoreSlug}}"
+        class="text-teal-600 hover:text-teal-700 transition-all duration-300"
+      >
+        {{.Store.StoreName}}
+      </a>
+      <span class="text-gray-400">/</span>
+      <span class="text-gray-500">{{.Product.Name}}</span>
     </div>
 
-    <!-- Product info -->
-    <div class="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-      <!-- Store info -->
-      <div class="mb-6">
-        <a
-          href="/ballarat/{{.Store.StoreSlug}}"
-          class="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+    <!-- Product Grid -->
+    <div class="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-stretch">
+      <!-- Image Gallery -->
+      <div
+        class="flex flex-col mb-8 lg:mb-0 {{if not .Product.ImagePath}}hide-no-image{{end}}"
+      >
+        <div
+          class="w-full h-full rounded-2xl bg-gray-100 overflow-hidden shadow-lg"
         >
-          {{.Store.StoreName}}
-        </a>
-      </div>
-
-      <!-- Product details -->
-      <h1 class="text-3xl font-bold tracking-tight text-gray-900">
-        {{.Product.Name}}
-      </h1>
-
-      <div class="mt-3">
-        <h2 class="sr-only">Product information</h2>
-        <p class="text-3xl tracking-tight text-gray-900">
-          ${{printf "%.2f" .Product.Price}}
-        </p>
-      </div>
-
-      <!-- Delivery/Pickup badges -->
-      <div class="mt-6 flex items-center space-x-3">
-        {{if .Product.HasDelivery}}
-        <span
-          class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800"
-        >
-          Delivery Available
-        </span>
-        {{end}} {{if .Product.HasPickup}}
-        <span
-          class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
-        >
-          Pickup Available
-        </span>
-        {{end}}
-      </div>
-
-      <!-- Category -->
-      <div class="mt-4">
-        <span class="text-sm text-gray-600"
-          >Category: {{.Product.Category}}</span
-        >
-      </div>
-
-      <div class="mt-6">
-        <h3 class="sr-only">Description</h3>
-        <div class="space-y-6 text-base text-gray-700">
-          {{.Product.Description}}
-        </div>
-      </div>
-
-      <!-- Store details -->
-      <div class="mt-8 border-t border-gray-200 pt-8">
-        <h3 class="text-lg font-medium text-gray-900">Store Information</h3>
-        <div class="mt-4 space-y-4">
-          {{if .Store.Location}}
-          <div class="flex items-start">
+          {{if .Product.ImagePath}}
+          <img
+            src="{{.Product.ImagePath}}"
+            alt="{{.Product.Name}}"
+            class="object-cover object-center w-full h-full animate-fade-in-up"
+          />
+          {{else}}
+          <div
+            class="w-full h-full flex items-center justify-center bg-gray-100 rounded-2xl"
+          >
             <svg
-              class="h-5 w-5 text-gray-400"
+              class="h-16 w-16 text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -100,72 +58,231 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
               />
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <p class="ml-2 text-sm text-gray-600">{{.Store.Location}}</p>
-          </div>
-          {{end}} {{if .Store.OpeningHours}}
-          <div class="flex items-start">
-            <svg
-              class="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <p class="ml-2 text-sm text-gray-600">{{.Store.OpeningHours}}</p>
           </div>
           {{end}}
-
-          <div class="flex items-start">
-            <svg
-              class="h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
-            </svg>
-            <a
-              href="/ballarat/{{.Store.StoreSlug}}"
-              class="ml-2 text-sm text-indigo-600 hover:text-indigo-900"
-            >
-              Visit Store Page
-            </a>
-          </div>
         </div>
       </div>
 
-      <!-- Contact store button -->
-      <div class="mt-8">
-        {{if .Store.Email}}
-        <a
-          href="mailto:{{.Store.Email}}?subject=Enquiry about {{.Product.Name}}"
-          class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10"
-        >
-          Contact Store
-        </a>
-        {{end}}
+      <!-- Product Info -->
+      <div
+        class="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0 bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-6 sm:p-8"
+      >
+        <div class="p-4 sm:p-6">
+          <!-- Store Info -->
+          <div class="mb-8">
+            <a
+              href="/ballarat/{{.Store.StoreSlug}}"
+              class="text-teal-600 hover:text-teal-700 text-sm font-medium transition-all duration-300"
+              style="font-family: &quot;Poppins&quot;, sans-serif"
+            >
+              {{.Store.StoreName}}
+            </a>
+          </div>
+
+          <!-- Product Details -->
+          <h1
+            class="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 animate-fade-in-down"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            {{.Product.Name}}
+          </h1>
+
+          <div class="mt-4">
+            <h2 class="sr-only">Product information</h2>
+            <p
+              class="text-2xl sm:text-3xl tracking-tight text-gray-900"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              ${{printf "%.2f" .Product.Price}}
+            </p>
+          </div>
+
+          <!-- Delivery/Pickup Badges -->
+          <div class="mt-8 flex items-center space-x-3">
+            {{if .Product.HasDelivery}}
+            <span
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Delivery Available
+            </span>
+            {{end}} {{if .Product.HasPickup}}
+            <span
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Pickup Available
+            </span>
+            {{end}}
+          </div>
+
+          <!-- Category -->
+          <div class="mt-6">
+            <span
+              class="text-sm text-gray-600"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Category: {{.Product.Category}}
+            </span>
+          </div>
+
+          <!-- Description -->
+          <div class="mt-8">
+            <h3 class="sr-only">Description</h3>
+            <div
+              class="space-y-4 text-base text-gray-700"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              {{.Product.Description}}
+            </div>
+          </div>
+
+          <!-- Store Details -->
+          <div class="mt-10 border-t border-gray-200 pt-8">
+            <h3
+              class="text-lg font-medium text-gray-900"
+              style="font-family: &quot;Poppins&quot;, sans-serif"
+            >
+              Store Information
+            </h3>
+            <div class="mt-6 space-y-4">
+              {{if .Store.Location}}
+              <div class="flex items-start">
+                <svg
+                  class="h-5 w-5 text-teal-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <p
+                  class="ml-2 text-sm text-gray-600"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  {{.Store.Location}}
+                </p>
+              </div>
+              {{end}} {{if .Store.OpeningHours}}
+              <div class="flex items-start">
+                <svg
+                  class="h-5 w-5 text-teal-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <p
+                  class="ml-2 text-sm text-gray-600"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  {{.Store.OpeningHours}}
+                </p>
+              </div>
+              {{end}}
+              <div class="flex items-start">
+                <svg
+                  class="h-5 w-5 text-teal-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  />
+                </svg>
+                <a
+                  href="/ballarat/{{.Store.StoreSlug}}"
+                  class="ml-2 text-sm text-teal-600 hover:text-teal-700 transition-all duration-300"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  Visit Store Page
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Store Button -->
+          <div class="mt-10">
+            {{if .Store.Email}}
+            <a
+              href="mailto:{{.Store.Email}}?subject=Enquiry about {{.Product.Name}}"
+              class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Contact Store
+            </a>
+            {{end}}
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-down {
+    animation: fade-in-down 0.8s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+
+  /* Hide Image Gallery when no image and screen width < 1025px */
+  @media (max-width: 1024px) {
+    .hide-no-image {
+      display: none;
+    }
+  }
+</style>
 {{end}}

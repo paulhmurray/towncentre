@@ -1,10 +1,7 @@
 {{define "title"}}Launch TownCentre - Be the First{{end}} {{define "main"}}
-<div class="flex items-center space-x-2">
-  <!-- Logo Icon -->
-</div>
-<div class="bg-white">
+<div class="bg-gray-50">
   <!-- Hero Section -->
-  <div class="relative">
+  <div class="relative overflow-hidden">
     <div class="absolute inset-0">
       <img
         src="/assets/lake_wendouree.jpg"
@@ -12,26 +9,35 @@
         class="w-full h-full object-cover"
       />
       <div
-        class="absolute inset-0 bg-indigo-600 mix-blend-multiply opacity-90"
+        class="absolute inset-0 bg-gradient-to-b from-teal-900/70 to-blue-900/30"
       ></div>
     </div>
-    <div class="relative px-6 py-16">
-      <div class="max-w-3xl mx-auto text-center text-white">
-        <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
+    <div class="relative px-6 py-20 sm:py-32">
+      <div class="max-w-4xl mx-auto text-center text-white">
+        <h1
+          class="text-4xl sm:text-6xl font-extrabold tracking-tight animate-fade-in-down"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
           Be the First to Launch Your Store in Ballarat
         </h1>
-        <p class="mt-6 text-lg leading-8">
+        <p
+          class="mt-6 text-lg sm:text-xl leading-8 text-gray-100 animate-fade-in-up"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >
           Join TownCentre’s pre-launch phase—set up your online store for free
           and reach Ballarat customers when we go live. No tech skills needed.
         </p>
-        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <div
+          class="mt-10 flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up"
+        >
           <a
             href="/merchant/register"
-            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 shadow-md"
+            class="inline-flex items-center px-6 py-4 text-base font-medium rounded-xl text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 shadow-lg transform hover:scale-105 transition-all duration-300"
+            style="font-family: &quot;Inter&quot;, sans-serif"
           >
             Claim Your Store Now
             <svg
-              class="ml-2 -mr-1 h-5 w-5"
+              class="ml-2 h-5 w-5"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -47,9 +53,11 @@
           </a>
           <a
             href="/learn"
-            class="inline-flex items-center px-6 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white hover:text-indigo-800"
-            >Learn More</a
+            class="inline-flex items-center px-6 py-4 border border-white/30 text-base font-medium rounded-xl text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300"
+            style="font-family: &quot;Inter&quot;, sans-serif"
           >
+            Learn More
+          </a>
         </div>
       </div>
     </div>
@@ -58,14 +66,25 @@
   <!-- Benefits Section -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
     <div class="text-center mb-16">
-      <h2 class="p-4 text-3xl font-bold text-gray-900">Why Join Early?</h2>
-      <p class="mt-4 text-lg text-gray-600">
+      <h2
+        class="text-4xl font-extrabold text-gray-900"
+        style="font-family: &quot;Poppins&quot;, sans-serif"
+      >
+        Why Join Early?
+      </h2>
+      <p
+        class="mt-4 text-lg text-gray-600"
+        style="font-family: &quot;Inter&quot;, sans-serif"
+      >
         Get a head start with Ballarat’s new marketplace.
       </p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      <div class="bg-white p-6 rounded-lg shadow-md border">
-        <div class="text-indigo-600 mb-4">
+      <!-- Tile 1 -->
+      <div
+        class="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="text-teal-500 mb-4">
           <svg
             class="h-8 w-8"
             fill="none"
@@ -80,13 +99,24 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-medium text-gray-900 mb-2">Quick Setup</h3>
-        <p class="text-gray-600">
+        <h3
+          class="text-xl font-semibold text-gray-900 mb-2"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Quick Setup
+        </h3>
+        <p
+          class="text-gray-600"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >
           Build your store in minutes—no website or tech skills needed.
         </p>
       </div>
-      <div class="bg-white p-6 rounded-lg shadow-md border">
-        <div class="text-indigo-600 mb-4">
+      <!-- Tile 2 -->
+      <div
+        class="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="text-teal-500 mb-4">
           <svg
             class="h-8 w-8"
             fill="none"
@@ -101,13 +131,24 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-medium text-gray-900 mb-2">Local Buyers</h3>
-        <p class="text-gray-600">
+        <h3
+          class="text-xl font-semibold text-gray-900 mb-2"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Local Buyers
+        </h3>
+        <p
+          class="text-gray-600"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >
           Reach Ballarat customers eager to shop local.
         </p>
       </div>
-      <div class="bg-white p-6 rounded-lg shadow-md border">
-        <div class="text-indigo-600 mb-4">
+      <!-- Tile 3 -->
+      <div
+        class="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="text-teal-500 mb-4">
           <svg
             class="h-8 w-8"
             fill="none"
@@ -122,11 +163,24 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-medium text-gray-900 mb-2">Zero Risk</h3>
-        <p class="text-gray-600">Free to join now—only pay when sales start.</p>
+        <h3
+          class="text-xl font-semibold text-gray-900 mb-2"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Zero Risk
+        </h3>
+        <p
+          class="text-gray-600"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >
+          Free to join now—only pay when sales start.
+        </p>
       </div>
-      <div class="bg-white p-6 rounded-lg shadow-md border">
-        <div class="text-indigo-600 mb-4">
+      <!-- Tile 4 -->
+      <div
+        class="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="text-teal-500 mb-4">
           <svg
             class="h-8 w-8"
             fill="none"
@@ -141,34 +195,85 @@
             />
           </svg>
         </div>
-        <h3 class="text-xl font-medium text-gray-900 mb-2">Early Advantage</h3>
-        <p class="text-gray-600">Be featured when we launch to shoppers.</p>
+        <h3
+          class="text-xl font-semibold text-gray-900 mb-2"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Early Advantage
+        </h3>
+        <p
+          class="text-gray-600"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >
+          Be featured when we launch to shoppers.
+        </p>
       </div>
     </div>
 
     <!-- CTA Section -->
-    <div class="mt-16 text-center">
-      <h2 class="p-4 text-2xl font-bold text-gray-900 mb-4">
+    <div class="mt-20 text-center">
+      <h2
+        class="text-3xl font-extrabold text-gray-900 mb-4"
+        style="font-family: &quot;Poppins&quot;, sans-serif"
+      >
         Ready to Be First?
       </h2>
-      <p class="text-lg text-gray-600 mb-4">
+      <p
+        class="text-lg text-gray-600 mb-6"
+        style="font-family: &quot;Inter&quot;, sans-serif"
+      >
         Reserve your spot in Ballarat’s digital marketplace—free until launch.
       </p>
       <a
         href="/merchant/register"
-        class="p-4 inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 shadow-md"
+        class="inline-flex items-center px-8 py-4 text-base font-medium rounded-xl text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 shadow-lg transform hover:scale-105 transition-all duration-300"
+        style="font-family: &quot;Inter&quot;, sans-serif"
       >
         Open Your Store Now
       </a>
-      <p class="mt-4 text-sm text-gray-500">
+      <p
+        class="mt-6 text-sm text-gray-500"
+        style="font-family: &quot;Inter&quot;, sans-serif"
+      >
         Built by a Ballarat local. Questions?
         <a
           href="mailto:support@towncentre.au"
-          class="text-indigo-600 hover:text-indigo-800"
-          >Email us</a
+          class="text-teal-500 hover:text-teal-600"
+        >
+          Email us </a
         >.
       </p>
     </div>
   </div>
 </div>
+
+<style>
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-down {
+    animation: fade-in-down 0.8s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+</style>
 {{end}}

@@ -1,168 +1,259 @@
 {{define "title"}}Store Settings - TownCentre{{end}} {{define "main"}}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <!-- Header with store link -->
-  <div class="bg-white shadow sm:rounded-lg mb-8 p-4">
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-2xl font-bold text-gray-900">Store Settings</h2>
-        <p class="mt-1 text-sm text-gray-500">
-          Manage your store's information and appearance
-        </p>
+<div class="relative min-h-screen bg-gray-50">
+  <!-- Hero Background -->
+  <div
+    class="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-teal-100/30 to-blue-100/30 z-0"
+  ></div>
+
+  <!-- Main Content -->
+  <div class="relative max-w-2xl mx-auto px-4 sm:px-6 py-8 z-10">
+    <!-- Header Section -->
+    <div
+      class="text-center mb-8 bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-6 sm:p-8 animate-fade-in-down"
+    >
+      <h2
+        class="text-3xl sm:text-4xl font-extrabold text-gray-900"
+        style="font-family: &quot;Poppins&quot;, sans-serif"
+      >
+        Store Settings
+      </h2>
+      <p
+        class="mt-2 text-sm text-gray-500"
+        style="font-family: &quot;Inter&quot;, sans-serif"
+      >
+        Manage your store's information and appearance
+      </p>
+      <div class="mt-4 flex justify-center">
+        <a
+          href="/merchant/dashboard"
+          class="inline-flex items-center px-4 py-2 border border-gray-200 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >
+          <svg
+            class="h-5 w-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Back to Dashboard
+        </a>
       </div>
     </div>
-  </div>
 
-  <!-- Settings Form -->
-  <div class="bg-white shadow sm:rounded-lg">
-    <form
-      hx-post="/merchant/settings"
-      hx-swap="afterend"
-      hx-encoding="multipart/form-data"
-      enctype="multipart/form-data"
-      class="space-y-8"
-    >
-      <div class="p-6 space-y-8">
-        <!-- Store Name -->
-        <div class="space-y-2">
-          <label
-            for="store-name"
-            class="block text-sm font-medium text-gray-900"
-            >Store Name</label
-          >
-          <p class="text-sm text-gray-500">
-            This is how your store will appear to customers.
-          </p>
-          <input
-            type="text"
-            name="store-name"
-            id="store-name"
-            value="{{if .Merchant.StoreName}}{{.Merchant.StoreName}}{{else}}{{.Merchant.BusinessName}}{{end}}"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-          />
-        </div>
-        <!-- Store logo-->
-        <div class="my-8 border-t border-b border-gray-200 py-6">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">Store Logo</h3>
+    <!-- Settings Form -->
+    <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-6 sm:p-8">
+      <form
+        hx-post="/merchant/settings"
+        hx-swap="afterend"
+        hx-encoding="multipart/form-data"
+        enctype="multipart/form-data"
+        class="space-y-8"
+      >
+        <div class="p-4 sm:p-6 space-y-8">
+          <!-- Inner padding for content -->
+          <!-- Store Name -->
+          <div class="space-y-2">
+            <label
+              for="store-name"
+              class="block text-sm font-medium text-gray-900"
+              style="font-family: &quot;Poppins&quot;, sans-serif"
+            >
+              Store Name
+            </label>
+            <p
+              class="text-sm text-gray-500"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              This is how your store will appear to customers.
+            </p>
+            <input
+              type="text"
+              name="store-name"
+              id="store-name"
+              value="{{if .Merchant.StoreName}}{{.Merchant.StoreName}}{{else}}{{.Merchant.BusinessName}}{{end}}"
+              class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            />
+          </div>
 
-          <div class="flex items-start">
-            <div class="mr-6">
-              <!-- Logo Preview -->
-              <div
-                class="rounded-full bg-white shadow-sm overflow-hidden w-32 h-32 flex items-center justify-center border border-gray-200"
-              >
-                {{if .Merchant.LogoPath}}
-                <img
-                  id="logo-preview"
-                  src="{{.Merchant.LogoPath}}"
-                  alt="Store logo"
-                  class="w-full h-full object-cover"
+          <!-- Store Logo -->
+          <div class="my-8 border-t border-b border-gray-200 py-6">
+            <h3
+              class="text-lg font-medium text-gray-900 mb-4"
+              style="font-family: &quot;Poppins&quot;, sans-serif"
+            >
+              Store Logo
+            </h3>
+            <div class="flex items-start">
+              <div class="mr-6">
+                <!-- Logo Preview -->
+                <div
+                  class="rounded-full bg-white shadow-sm overflow-hidden w-32 h-32 flex items-center justify-center border border-gray-200"
+                >
+                  {{if .Merchant.LogoPath}}
+                  <img
+                    id="logo-preview"
+                    src="{{.Merchant.LogoPath}}"
+                    alt="Store logo"
+                    class="w-full h-full object-cover"
+                  />
+                  {{else}}
+                  <img
+                    id="logo-preview"
+                    src="/api/placeholder/128/128"
+                    alt="Logo preview"
+                    class="w-full h-full object-cover bg-gray-100"
+                  />
+                  {{end}}
+                </div>
+              </div>
+              <div class="flex-1">
+                <label
+                  for="logo"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                  style="font-family: &quot;Poppins&quot;, sans-serif"
+                >
+                  Upload Store Logo
+                </label>
+                <input
+                  type="file"
+                  name="logo"
+                  id="logo"
+                  accept="image/*"
+                  class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                  onchange="previewLogo(this)"
                 />
-                {{else}}
-                <img
-                  id="logo-preview"
-                  src="/api/placeholder/128/128"
-                  alt="Logo preview"
-                  class="w-full h-full object-cover bg-gray-100"
-                />
-                {{end}}
+                <p
+                  class="mt-2 text-sm text-gray-500"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  Upload a square image for best results. PNG, JPG or GIF up to
+                  2MB.
+                </p>
+                <p
+                  class="mt-1 text-xs text-gray-500"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  Your logo will appear in a circular frame on your store page.
+                </p>
               </div>
             </div>
+          </div>
 
-            <div class="flex-1">
-              <label
-                for="logo"
-                class="block text-sm font-medium text-gray-700 mb-2"
-                >Upload Store Logo</label
+          <!-- Store Description -->
+          <div class="space-y-2">
+            <label
+              for="description"
+              class="block text-sm font-medium text-gray-900"
+              style="font-family: &quot;Poppins&quot;, sans-serif"
+            >
+              Store Description
+            </label>
+            <p
+              class="text-sm text-gray-500"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Tell customers about your store and what makes it special.
+            </p>
+            <textarea
+              name="description"
+              id="description"
+              rows="4"
+              class="mt-1 block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+{{.Merchant.Description}}</textarea
+            >
+          </div>
+
+          <!-- Location -->
+          <div class="space-y-2">
+            <label
+              for="location"
+              class="block text-sm font-medium text-gray-900"
+              style="font-family: &quot;Poppins&quot;, sans-serif"
+            >
+              Store Location
+            </label>
+            <p
+              class="text-sm text-gray-500"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Your physical store address (if applicable).
+            </p>
+            <input
+              type="text"
+              name="location"
+              id="location"
+              value="{{.Merchant.Location}}"
+              class="mt-1 block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            />
+          </div>
+
+          <!-- Opening Hours -->
+          <div class="space-y-2">
+            <label
+              for="opening-hours"
+              class="block text-sm font-medium text-gray-900"
+              style="font-family: &quot;Poppins&quot;, sans-serif"
+            >
+              Opening Hours
+            </label>
+            <p
+              class="text-sm text-gray-500"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Enter your store's opening hours. Use new lines for different
+              days.
+            </p>
+            <textarea
+              name="opening-hours"
+              id="opening-hours"
+              rows="4"
+              class="mt-1 block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+{{.Merchant.OpeningHours}}</textarea
+            >
+          </div>
+
+          <!-- Save Button -->
+          <div class="flex justify-end pt-6">
+            <button
+              type="submit"
+              class="inline-flex justify-center items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-base font-medium text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              <svg
+                class="h-5 w-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-              <input
-                type="file"
-                name="logo"
-                id="logo"
-                accept="image/*"
-                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                onchange="previewLogo(this)"
-              />
-              <p class="mt-2 text-sm text-gray-500">
-                Upload a square image for best results. PNG, JPG or GIF up to
-                2MB.
-              </p>
-              <p class="mt-1 text-xs text-gray-500">
-                Your logo will appear in a circular frame on your store page.
-              </p>
-            </div>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              Save Changes
+            </button>
           </div>
         </div>
-
-        <!-- Store Description -->
-        <div class="space-y-2">
-          <label
-            for="description"
-            class="block text-sm font-medium text-gray-900"
-            >Store Description</label
-          >
-          <p class="text-sm text-gray-500">
-            Tell customers about your store and what makes it special.
-          </p>
-          <textarea
-            name="description"
-            id="description"
-            rows="4"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-          >
-{{.Merchant.Description}}</textarea
-          >
-        </div>
-
-        <!-- Location -->
-        <div class="space-y-2">
-          <label for="location" class="block text-sm font-medium text-gray-900"
-            >Store Location</label
-          >
-          <p class="text-sm text-gray-500">
-            Your physical store address (if applicable).
-          </p>
-          <input
-            type="text"
-            name="location"
-            id="location"
-            value="{{.Merchant.Location}}"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-          />
-        </div>
-
-        <!-- Opening Hours -->
-        <div class="space-y-2">
-          <label
-            for="opening-hours"
-            class="block text-sm font-medium text-gray-900"
-            >Opening Hours</label
-          >
-          <p class="text-sm text-gray-500">
-            Enter your store's opening hours. Use new lines for different days.
-          </p>
-          <textarea
-            name="opening-hours"
-            id="opening-hours"
-            rows="4"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-          >
-{{.Merchant.OpeningHours}}</textarea
-          >
-        </div>
-
-        <!-- Save Button -->
-        <div class="flex justify-end pt-4">
-          <button
-            type="submit"
-            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Save Changes
-          </button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </div>
+
 <script>
   function previewLogo(input) {
     if (input.files && input.files[0]) {
@@ -176,4 +267,34 @@
     }
   }
 </script>
+
+<style>
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-down {
+    animation: fade-in-down 0.8s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+</style>
 {{end}}

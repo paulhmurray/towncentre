@@ -1,17 +1,23 @@
 {{define "title"}}Login - TownCentre{{end}} {{define "main"}}
 <div
-  class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+  class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50"
 >
   <div class="max-w-md w-full space-y-8" id="login-container">
-    <div>
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <div class="text-center">
+      <h2
+        class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4 animate-fade-in-down"
+        style="font-family: &quot;Poppins&quot;, sans-serif"
+      >
         Sign in to your store
       </h2>
-      <p class="mt-2 text-center text-sm text-gray-600">
+      <p
+        class="text-sm sm:text-base text-gray-600 animate-fade-in-up"
+        style="font-family: &quot;Inter&quot;, sans-serif"
+      >
         Or
         <a
           href="/merchant/register"
-          class="font-medium text-indigo-600 hover:text-indigo-500"
+          class="font-medium text-teal-500 hover:text-teal-600 transition-all duration-300"
         >
           open your store today
         </a>
@@ -20,7 +26,9 @@
 
     <!-- Error Message -->
     {{if .Error}}
-    <div class="rounded-md bg-red-50 p-4">
+    <div
+      class="rounded-xl bg-red-50/80 backdrop-blur-md p-4 shadow-md border border-red-100"
+    >
       <div class="flex">
         <div class="flex-shrink-0">
           <svg
@@ -37,7 +45,12 @@
           </svg>
         </div>
         <div class="ml-3">
-          <p class="text-sm font-medium text-red-800">{{.Error}}</p>
+          <p
+            class="text-sm font-medium text-red-800"
+            style="font-family: &quot;Inter&quot;, sans-serif"
+          >
+            {{.Error}}
+          </p>
         </div>
       </div>
     </div>
@@ -48,67 +61,115 @@
       hx-target="#login-container"
       class="mt-8 space-y-6"
     >
-      <div class="rounded-md shadow-sm -space-y-px">
-        <div>
-          <label for="email" class="sr-only">Email address</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            placeholder="Email address"
-          />
-        </div>
-        <div>
-          <label for="password" class="sr-only">Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            placeholder="Password"
-          />
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between">
-        <div class="text-sm">
-          <a
-            href="/forgot-password"
-            class="font-medium text-indigo-600 hover:text-indigo-500"
-          >
-            Forgot your password?
-          </a>
-        </div>
-      </div>
-
-      <div class="relative">
-        <button
-          type="submit"
-          class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          hx-disable-element="this"
-        >
-          <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-            <svg
-              class="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
+      <div
+        class="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100"
+      >
+        <div class="rounded-md shadow-sm -space-y-px">
+          <div>
+            <label
+              for="email"
+              class="block text-sm font-medium text-gray-700 sr-only"
+              style="font-family: &quot;Inter&quot;, sans-serif"
             >
-              <path
-                fill-rule="evenodd"
-                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </span>
-          <span class="htmx-indicator-show:hidden">Sign in</span>
-        </button>
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-200 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-teal-500 focus:border-teal-500 transition-all duration-300"
+              placeholder="Email address"
+            />
+          </div>
+          <div class="mt-4">
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-700 sr-only"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-200 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-teal-500 focus:border-teal-500 transition-all duration-300"
+              placeholder="Password"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mt-6">
+          <div class="text-sm">
+            <a
+              href="/forgot-password"
+              class="font-medium text-teal-500 hover:text-teal-600 transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Forgot your password?
+            </a>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <button
+            type="submit"
+            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 shadow-lg transform hover:scale-105 transition-all duration-300"
+            style="font-family: &quot;Inter&quot;, sans-serif"
+            hx-disable-element="this"
+          >
+            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+              <svg
+                class="h-5 w-5 text-white group-hover:text-gray-100"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </span>
+            <span class="htmx-indicator-show:hidden">Sign in</span>
+          </button>
+        </div>
       </div>
     </form>
   </div>
 </div>
+
+<style>
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-down {
+    animation: fade-in-down 0.8s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+</style>
 {{end}}

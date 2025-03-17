@@ -1,278 +1,400 @@
 {{define "title"}}Start Your Business - TownCentre{{end}} {{define "main"}}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-  <div class="max-w-3xl mx-auto">
-    <!-- Introduction Section -->
-    <div class="text-center mb-12">
-      <h1 class="text-3xl font-bold text-gray-900 mb-4">
-        Start Your Business Journey Today
-      </h1>
-      <p class="text-lg text-gray-600">
-        Test your business idea with minimal risk. No website needed, no
-        physical store required.
-      </p>
-    </div>
-
-    <!-- Benefits Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-      <div class="bg-white p-6 rounded-lg shadow-sm border">
-        <div class="text-indigo-600 mb-2">
-          <svg
-            class="h-8 w-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            />
-          </svg>
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Quick Start</h3>
-        <p class="text-gray-600">
-          Begin selling your products immediately with our easy-to-use platform.
-          No technical experience needed.
+<div class="bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-3xl mx-auto">
+      <!-- Introduction Section -->
+      <div class="text-center mb-12">
+        <h1
+          class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4 animate-fade-in-down"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Start Your Business Journey Today
+        </h1>
+        <p
+          class="text-lg sm:text-xl text-gray-600 animate-fade-in-up"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >
+          Test your business idea with minimal risk. No website needed, no
+          physical store required.
         </p>
       </div>
 
-      <div class="bg-white p-6 rounded-lg shadow-sm border">
-        <div class="text-indigo-600 mb-2">
-          <svg
-            class="h-8 w-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2"
-            />
-          </svg>
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Low Risk</h3>
-        <p class="text-gray-600">
-          Test your market without the overhead of a physical store or expensive
-          website.
-        </p>
-      </div>
-
-      <div class="bg-white p-6 rounded-lg shadow-sm border">
-        <div class="text-indigo-600 mb-2">
-          <svg
-            class="h-8 w-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
-            />
-          </svg>
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Local Focus</h3>
-        <p class="text-gray-600">
-          Connect with Ballarat customers who want to support local businesses.
-        </p>
-      </div>
-
-      <div class="bg-white p-6 rounded-lg shadow-sm border">
-        <div class="text-indigo-600 mb-2">
-          <svg
-            class="h-8 w-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
-            />
-          </svg>
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Support & Growth</h3>
-        <p class="text-gray-600">
-          Get guidance and support from our community of local business owners.
-        </p>
-      </div>
-    </div>
-
-    <!-- Registration Form -->
-    <div class="bg-white p-8 rounded-lg shadow-sm border">
-      <h2 class="text-2xl font-bold text-gray-900 mb-6">Create Your Account</h2>
-      <form
-        hx-post="/merchant/register"
-        hx-swap="outerHTML"
-        class="space-y-6"
-        hx-indicator="#submit-indicator"
-      >
-        <div class="grid grid-cols-1 gap-6">
-          <div>
-            <label
-              for="business-name"
-              class="block text-sm font-medium text-gray-700"
-              >Business Name</label
-            >
-            <input
-              type="text"
-              name="business-name"
-              id="business-name"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            />
-          </div>
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700"
-              >Email</label
-            >
-            <input
-              type="email"
-              name="email"
-              id="email"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            />
-          </div>
-          <div>
-            <label
-              for="password"
-              class="block text-sm font-medium text-gray-700"
-              >Password</label
-            >
-            <input
-              type="password"
-              name="password"
-              id="password"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            />
-          </div>
-          <div>
-            <label
-              for="password-confirm"
-              class="block text-sm font-medium text-gray-700"
-              >Confirm Password</label
-            >
-            <input
-              type="password"
-              name="password-confirm"
-              id="password-confirm"
-              required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            />
-          </div>
-          <div>
-            <label for="phone" class="block text-sm font-medium text-gray-700"
-              >Phone (optional)</label
-            >
-            <input
-              type="tel"
-              name="phone"
-              id="phone"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            />
-          </div>
-          <div>
-            <label
-              for="business-type"
-              class="block text-sm font-medium text-gray-700"
-              >What type of business are you starting?</label
-            >
-            <select
-              name="business-type"
-              id="business-type"
-              required
-              hx-get="/merchant/check-business-type"
-              hx-target="#other-business-type-container"
-              hx-swap="outerHTML"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4"
-            >
-              <option value="">Select a category</option>
-              <option value="food">Food & Drink</option>
-              <option value="retail">Retail</option>
-              <option value="services">Services</option>
-              <option value="crafts">Local Crafts</option>
-              <option value="health">Health & Wellness</option>
-              <option value="arts">Creative Arts</option>
-              <option value="home">Home & Garden</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div
-            id="other-business-type-container"
-            class="hidden"
-            hx-swap-oob="true"
-          >
-            <!-- This gets replaced by the HTMX response -->
-          </div>
-        </div>
-
-        <!-- Terms and Conditions Checkbox -->
-        <div class="mt-6">
-          <div class="relative flex items-start">
-            <div class="flex items-center h-5">
-              <input
-                id="terms"
-                name="terms"
-                type="checkbox"
-                required
-                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-            </div>
-            <div class="ml-3 text-sm">
-              <label for="terms" class="font-medium text-gray-700">
-                I agree to the Terms and Conditions
-              </label>
-              <p class="text-gray-500">
-                By creating an account, you agree to our
-                <a
-                  href="/terms"
-                  target="_blank"
-                  class="text-indigo-600 hover:text-indigo-800"
-                >
-                  Terms of Service
-                </a>
-                , including our approach to dispute resolution, liability
-                limitations, and merchant obligations.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="flex items-center justify-end">
-          <button
-            type="submit"
-            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Start Your Business
+      <!-- Benefits Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <!-- Tile 1 -->
+        <div
+          class="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+        >
+          <div class="text-teal-500 mb-4">
             <svg
-              class="ml-2 -mr-1 h-5 w-5"
-              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8"
               fill="none"
-              viewBox="0 0 24 24"
               stroke="currentColor"
+              viewBox="0 0 24 24"
             >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M13 7l5 5m0 0l-5 5m5-5H6"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
               />
             </svg>
-          </button>
-          <div id="submit-indicator" class="htmx-indicator">
-            <span class="text-sm text-gray-500">Submitting...</span>
           </div>
+          <h3
+            class="text-xl font-semibold text-gray-900 mb-2"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            Quick Start
+          </h3>
+          <p
+            class="text-gray-600"
+            style="font-family: &quot;Inter&quot;, sans-serif"
+          >
+            Begin selling your products immediately with our easy-to-use
+            platform. No technical experience needed.
+          </p>
         </div>
-      </form>
+
+        <!-- Tile 2 -->
+        <div
+          class="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+        >
+          <div class="text-teal-500 mb-4">
+            <svg
+              class="h-8 w-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2"
+              />
+            </svg>
+          </div>
+          <h3
+            class="text-xl font-semibold text-gray-900 mb-2"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            Low Risk
+          </h3>
+          <p
+            class="text-gray-600"
+            style="font-family: &quot;Inter&quot;, sans-serif"
+          >
+            Test your market without the overhead of a physical store or
+            expensive website.
+          </p>
+        </div>
+
+        <!-- Tile 3 -->
+        <div
+          class="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+        >
+          <div class="text-teal-500 mb-4">
+            <svg
+              class="h-8 w-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
+              />
+            </svg>
+          </div>
+          <h3
+            class="text-xl font-semibold text-gray-900 mb-2"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            Local Focus
+          </h3>
+          <p
+            class="text-gray-600"
+            style="font-family: &quot;Inter&quot;, sans-serif"
+          >
+            Connect with Ballarat customers who want to support local
+            businesses.
+          </p>
+        </div>
+
+        <!-- Tile 4 -->
+        <div
+          class="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+        >
+          <div class="text-teal-500 mb-4">
+            <svg
+              class="h-8 w-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
+              />
+            </svg>
+          </div>
+          <h3
+            class="text-xl font-semibold text-gray-900 mb-2"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            Support & Growth
+          </h3>
+          <p
+            class="text-gray-600"
+            style="font-family: &quot;Inter&quot;, sans-serif"
+          >
+            Get guidance and support from our community of local business
+            owners.
+          </p>
+        </div>
+      </div>
+
+      <!-- Registration Form -->
+      <div
+        class="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-lg border border-gray-100"
+      >
+        <h2
+          class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-6"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Create Your Account
+        </h2>
+        <form
+          hx-post="/merchant/register"
+          hx-swap="outerHTML"
+          class="space-y-6"
+          hx-indicator="#submit-indicator"
+        >
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label
+                for="business-name"
+                class="block text-sm font-medium text-gray-700"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                Business Name
+              </label>
+              <input
+                type="text"
+                name="business-name"
+                id="business-name"
+                required
+                class="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label
+                for="email"
+                class="block text-sm font-medium text-gray-700"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                class="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label
+                for="password"
+                class="block text-sm font-medium text-gray-700"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                required
+                class="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label
+                for="password-confirm"
+                class="block text-sm font-medium text-gray-700"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                name="password-confirm"
+                id="password-confirm"
+                required
+                class="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label
+                for="phone"
+                class="block text-sm font-medium text-gray-700"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                Phone (optional)
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                id="phone"
+                class="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label
+                for="business-type"
+                class="block text-sm font-medium text-gray-700"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                What type of business are you starting?
+              </label>
+              <select
+                name="business-type"
+                id="business-type"
+                required
+                hx-get="/merchant/check-business-type"
+                hx-target="#other-business-type-container"
+                hx-swap="outerHTML"
+                class="mt-1 block w-full rounded-lg border-gray-200 shadow-sm focus:border-teal-500 focus:ring-teal-500 py-3 px-4 transition-all duration-300"
+              >
+                <option value="">Select a category</option>
+                <option value="food">Food & Drink</option>
+                <option value="retail">Retail</option>
+                <option value="services">Services</option>
+                <option value="crafts">Local Crafts</option>
+                <option value="health">Health & Wellness</option>
+                <option value="arts">Creative Arts</option>
+                <option value="home">Home & Garden</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div
+              id="other-business-type-container"
+              class="hidden"
+              hx-swap-oob="true"
+            >
+              <!-- This gets replaced by the HTMX response -->
+            </div>
+          </div>
+
+          <!-- Terms and Conditions Checkbox -->
+          <div class="mt-6">
+            <div class="relative flex items-start">
+              <div class="flex items-center h-5">
+                <input
+                  id="terms"
+                  name="terms"
+                  type="checkbox"
+                  required
+                  class="h-4 w-4 text-teal-500 focus:ring-teal-500 border-gray-300 rounded"
+                />
+              </div>
+              <div class="ml-3 text-sm">
+                <label
+                  for="terms"
+                  class="font-medium text-gray-700"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  I agree to the Terms and Conditions
+                </label>
+                <p
+                  class="text-gray-500"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  By creating an account, you agree to our
+                  <a
+                    href="/terms"
+                    target="_blank"
+                    class="text-teal-500 hover:text-teal-600 transition-all duration-300"
+                  >
+                    Terms of Service
+                  </a>
+                  , including our approach to dispute resolution, liability
+                  limitations, and merchant obligations.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="flex items-center justify-end">
+            <button
+              type="submit"
+              class="inline-flex items-center px-6 py-3 text-base font-medium rounded-xl text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 shadow-lg transform hover:scale-105 transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Start Your Business
+              <svg
+                class="ml-2 h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </button>
+            <div id="submit-indicator" class="htmx-indicator ml-4">
+              <span
+                class="text-sm text-gray-500"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                Submitting...
+              </span>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
+
+<style>
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-down {
+    animation: fade-in-down 0.8s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+</style>
 {{end}}

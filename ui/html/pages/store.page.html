@@ -1,130 +1,87 @@
 {{define "title"}}{{.Store.StoreName}} - TownCentre{{end}} {{define "main"}}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <!-- Store Header with Logo and Banner -->
-  <div class="flex flex-col md:flex-row gap-4 mb-8">
-    <!-- Logo Section - 1/4 width on desktop, full width and stacked on top for mobile -->
-    <div class="w-full md:w-1/4 flex justify-center items-center">
-      <div
-        class="rounded-full bg-white shadow-md overflow-hidden w-40 h-40 flex items-center justify-center border-2 border-gray-100"
-      >
-        {{if .Store.LogoPath}}
-        <img
-          src="{{.Store.LogoPath}}"
-          alt="{{.Store.StoreName}} logo"
-          class="w-full h-full object-cover"
-        />
-        {{else}}
-        <div class="text-center p-4">
-          <svg
-            class="h-16 w-16 text-gray-300 mx-auto"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-            />
-          </svg>
-          <p class="mt-2 text-xs text-gray-500">No logo uploaded</p>
-        </div>
-        {{end}}
-      </div>
-    </div>
+<div class="relative min-h-screen bg-gray-50">
+  <!-- Hero Background -->
+  <div
+    class="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-teal-100/30 to-blue-100/30 z-0"
+  ></div>
 
-    <!-- Banner Section - 3/4 width on desktop, full width on mobile -->
-    <div class="w-full md:w-3/4 relative">
-      <div
-        class="rounded-xl overflow-hidden h-40 md:h-64 bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center"
-      >
-        <div class="text-center text-white px-6 py-6 md:py-12 max-w-3xl">
-          <h1 class="text-3xl md:text-4xl font-bold tracking-tight">
-            {{.Store.StoreName}}
-          </h1>
-          <span
-            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white bg-opacity-20 text-white mt-3"
-          >
-            {{.Store.BusinessType}}
-          </span>
-        </div>
-      </div>
-
-      <!-- Contact Store Button - Repositioned for mobile compatibility -->
-      <div class="absolute top-4 right-4 sm:top-6 sm:right-6">
-        <button
-          onclick="document.getElementById('contact-form').classList.remove('hidden'); this.classList.add('hidden');"
-          class="flex items-center px-2 py-1 sm:px-4 sm:py-2 border border-white text-xs sm:text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 bg-opacity-90 hover:bg-opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
+  <!-- Main Content -->
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 z-10">
+    <!-- Store Header -->
+    <div class="text-center mb-8">
+      <div class="flex justify-center mb-4">
+        <div
+          class="relative rounded-full bg-white/90 backdrop-blur-md shadow-lg overflow-hidden w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center border-4 border-gray-100 ring-2 ring-teal-100 transform hover:scale-105 transition-all duration-300"
         >
-          <svg
-            class="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-            />
-          </svg>
-          <span>Contact</span>
-        </button>
+          {{if .Store.LogoPath}}
+          <img
+            src="{{.Store.LogoPath}}"
+            alt="{{.Store.StoreName}} logo"
+            class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          />
+          {{else}}
+          <div class="text-center p-4">
+            <svg
+              class="h-12 w-12 sm:h-16 sm:w-16 text-teal-300 mx-auto"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+              />
+            </svg>
+            <p
+              class="mt-2 text-xs text-gray-500"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              No logo uploaded
+            </p>
+          </div>
+          {{end}}
+        </div>
       </div>
-    </div>
-  </div>
-  <!-- Store Information Card -->
-  <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-    <div class="p-6 sm:p-8">
-      <!-- Description -->
-      {{if .Store.Description}}
-      <div class="prose max-w-none text-gray-600 mb-6">
-        <p class="text-lg">{{.Store.Description}}</p>
-      </div>
-      {{end}}
-
-      <div
-        class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-gray-100 pt-6"
+      <h1
+        class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 animate-fade-in-down"
+        style="font-family: &quot;Poppins&quot;, sans-serif"
       >
-        <!-- Location Info -->
-        {{if .Store.Location}}
-        <div class="flex items-start">
-          <div class="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
-            <svg
-              class="h-6 w-6 text-indigo-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <h3 class="text-base font-medium text-gray-900">Location</h3>
-            <p class="mt-1 text-sm text-gray-600">{{.Store.Location}}</p>
-          </div>
-        </div>
-        {{end}}
+        {{.Store.StoreName}}
+      </h1>
+      <span
+        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800 mt-3 shadow-sm animate-fade-in-up"
+        style="font-family: &quot;Inter&quot;, sans-serif"
+      >
+        {{.Store.BusinessType}}
+      </span>
+    </div>
 
-        <!-- Contact Info -->
-        {{if .Store.Phone}}
-        <div class="flex items-start">
-          <div class="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
+    <!-- Store Information Section -->
+    <div
+      class="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden mb-8"
+    >
+      <div class="p-6 sm:p-8">
+        <!-- About Section (Collapsible on Mobile) -->
+        {{if .Store.Description}}
+        <div
+          x-data="{ expanded: false }"
+          class="border-b border-gray-200 pb-4 mb-4"
+        >
+          <button
+            @click="expanded = !expanded"
+            class="flex justify-between items-center w-full text-left"
+          >
+            <h2
+              class="text-xl sm:text-2xl font-extrabold text-gray-900"
+              style="font-family: &quot;Poppins&quot;, sans-serif"
+            >
+              About {{.Store.StoreName}}
+            </h2>
             <svg
-              class="h-6 w-6 text-indigo-600"
+              :class="{ 'rotate-180': expanded }"
+              class="h-6 w-6 text-gray-500 transition-transform duration-300"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -133,55 +90,206 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                d="M19 9l-7 7-7-7"
               />
             </svg>
-          </div>
-          <div class="ml-4">
-            <h3 class="text-base font-medium text-gray-900">Contact</h3>
-            <p class="mt-1 text-sm text-gray-600">{{.Store.Phone}}</p>
-          </div>
-        </div>
-        {{end}}
-
-        <!-- Opening Hours -->
-        {{if .Store.OpeningHours}}
-        <div class="flex items-start">
-          <div class="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
-            <svg
-              class="h-6 w-6 text-indigo-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          </button>
+          <div x-show="expanded" x-transition.opacity class="mt-2">
+            <p
+              class="text-base text-gray-600"
+              style="font-family: &quot;Inter&quot;, sans-serif"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div class="ml-4">
-            <h3 class="text-base font-medium text-gray-900">Opening Hours</h3>
-            <p class="mt-1 text-sm text-gray-600 whitespace-pre-line">
-              {{.Store.OpeningHours}}
+              {{.Store.Description}}
             </p>
           </div>
         </div>
         {{end}}
+
+        <!-- Store Details (Collapsible on Mobile) -->
+        <div x-data="{ expanded: false }">
+          <button
+            @click="expanded = !expanded"
+            class="flex justify-between items-center w-full text-left"
+          >
+            <h2
+              class="text-xl sm:text-2xl font-extrabold text-gray-900"
+              style="font-family: &quot;Poppins&quot;, sans-serif"
+            >
+              Store Details
+            </h2>
+            <svg
+              :class="{ 'rotate-180': expanded }"
+              class="h-6 w-6 text-gray-500 transition-transform duration-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          <div x-show="expanded" x-transition.opacity class="mt-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <!-- Location Info -->
+              {{if .Store.Location}}
+              <div class="flex items-start">
+                <div class="flex-shrink-0 bg-teal-100 p-3 rounded-full">
+                  <svg
+                    class="h-6 w-6 text-teal-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <h3
+                    class="text-base font-medium text-gray-900"
+                    style="font-family: &quot;Poppins&quot;, sans-serif"
+                  >
+                    Location
+                  </h3>
+                  <p
+                    class="mt-1 text-sm text-gray-600"
+                    style="font-family: &quot;Inter&quot;, sans-serif"
+                  >
+                    {{.Store.Location}}
+                  </p>
+                </div>
+              </div>
+              {{end}}
+
+              <!-- Contact Info -->
+              {{if .Store.Phone}}
+              <div class="flex items-start">
+                <div class="flex-shrink-0 bg-teal-100 p-3 rounded-full">
+                  <svg
+                    class="h-6 w-6 text-teal-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <h3
+                    class="text-base font-medium text-gray-900"
+                    style="font-family: &quot;Poppins&quot;, sans-serif"
+                  >
+                    Contact
+                  </h3>
+                  <p
+                    class="mt-1 text-sm text-gray-600"
+                    style="font-family: &quot;Inter&quot;, sans-serif"
+                  >
+                    {{.Store.Phone}}
+                  </p>
+                </div>
+              </div>
+              {{end}}
+
+              <!-- Opening Hours -->
+              {{if .Store.OpeningHours}}
+              <div class="flex items-start">
+                <div class="flex-shrink-0 bg-teal-100 p-3 rounded-full">
+                  <svg
+                    class="h-6 w-6 text-teal-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <h3
+                    class="text-base font-medium text-gray-900"
+                    style="font-family: &quot;Poppins&quot;, sans-serif"
+                  >
+                    Opening Hours
+                  </h3>
+                  <p
+                    class="mt-1 text-sm text-gray-600 whitespace-pre-line"
+                    style="font-family: &quot;Inter&quot;, sans-serif"
+                  >
+                    {{.Store.OpeningHours}}
+                  </p>
+                </div>
+              </div>
+              {{end}}
+            </div>
+            <!-- Contact Store Button in Store Details -->
+            <div class="mt-6">
+              <button
+                onclick="document.getElementById('contact-modal').classList.remove('hidden');"
+                class="w-full sm:w-auto flex items-center px-4 py-2 sm:px-5 sm:py-3 border border-transparent text-sm sm:text-base font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-300"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                <svg
+                  class="h-4 w-4 sm:h-5 sm:w-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  />
+                </svg>
+                Contact Store
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Contact Store Form - Initially hidden -->
-  <div id="contact-form" class="hidden mb-8">
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-      <div class="p-6 sm:p-8">
+    <!-- Contact Modal -->
+    <div
+      id="contact-modal"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+    >
+      <div
+        class="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl w-full max-w-lg mx-4 p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto"
+      >
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-gray-900">Get in Touch</h2>
+          <h2
+            class="text-2xl sm:text-3xl font-extrabold text-gray-900"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            Get in Touch
+          </h2>
           <button
-            onclick="document.getElementById('contact-form').classList.add('hidden'); document.querySelector('[onclick*=contact-form]').classList.remove('hidden');"
+            onclick="document.getElementById('contact-modal').classList.add('hidden');"
             class="text-gray-400 hover:text-gray-500 p-2 rounded-full hover:bg-gray-100 transition-colors"
           >
             <svg
@@ -203,71 +311,97 @@
         <form
           hx-post="/store/{{.Store.ID}}/message"
           hx-swap="outerHTML"
-          class="space-y-6"
+          class="space-y-4"
         >
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label for="name" class="block text-sm font-medium text-gray-700"
-                >Name</label
+              <label
+                for="name"
+                class="block text-sm font-medium text-gray-700"
+                style="font-family: &quot;Inter&quot;, sans-serif"
               >
+                Name
+              </label>
               <input
                 type="text"
                 name="name"
                 id="name"
                 required
-                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
                 minlength="2"
                 maxlength="50"
+                style="font-family: &quot;Inter&quot;, sans-serif"
               />
             </div>
 
             <div>
-              <label for="email" class="block text-sm font-medium text-gray-700"
-                >Email</label
+              <label
+                for="email"
+                class="block text-sm font-medium text-gray-700"
+                style="font-family: &quot;Inter&quot;, sans-serif"
               >
+                Email
+              </label>
               <input
                 type="email"
                 name="email"
                 id="email"
                 required
-                class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+                style="font-family: &quot;Inter&quot;, sans-serif"
               />
             </div>
           </div>
 
           <div>
-            <label for="phone" class="block text-sm font-medium text-gray-700"
-              >Phone (optional)</label
+            <label
+              for="phone"
+              class="block text-sm font-medium text-gray-700"
+              style="font-family: &quot;Inter&quot;, sans-serif"
             >
+              Phone (optional)
+            </label>
             <input
               type="tel"
               name="phone"
               id="phone"
-              class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
             />
           </div>
 
           <div>
-            <label for="message" class="block text-sm font-medium text-gray-700"
-              >Message</label
+            <label
+              for="message"
+              class="block text-sm font-medium text-gray-700"
+              style="font-family: &quot;Inter&quot;, sans-serif"
             >
+              Message
+            </label>
             <textarea
               name="message"
               id="message"
               rows="4"
               required
-              class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
               minlength="10"
               maxlength="1000"
               placeholder="What would you like to know about this store or its products?"
+              style="font-family: &quot;Inter&quot;, sans-serif"
             ></textarea>
-            <p class="mt-1 text-sm text-gray-500">Maximum 1000 characters</p>
+            <p
+              class="mt-1 text-sm text-gray-500"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Maximum 1000 characters
+            </p>
           </div>
 
           <div class="flex justify-end">
             <button
               type="submit"
-              class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
             >
               <svg
                 class="h-5 w-5 mr-2"
@@ -288,66 +422,84 @@
         </form>
       </div>
     </div>
-  </div>
 
-  <!-- Products Section -->
-  {{if .Products}}
-  <div>
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-bold text-gray-900">Products</h2>
-
-      <!-- Product Category Filter (if implemented in future) -->
-      <div class="hidden sm:flex space-x-2">
-        <!-- This would be populated with product categories in future -->
-      </div>
-    </div>
-
-    <div
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-    >
-      {{range .Products}}
-      <a href="/product/view/{{.ID}}" class="group">
-        <div
-          class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 transform hover:shadow-lg hover:-translate-y-1 h-full flex flex-col"
+    <!-- Products Section -->
+    <div>
+      <div class="flex items-center justify-between mb-6">
+        <h2
+          class="text-2xl sm:text-3xl font-extrabold text-gray-900"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
         >
-          <!-- Product Image - Fixed Height -->
-          <div class="w-full h-56 overflow-hidden bg-gray-100">
-            {{if .ImagePath}}
-            <img
-              src="{{.ImagePath}}"
-              alt="{{.Name}}"
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            {{else}}
-            <div class="w-full h-full flex items-center justify-center">
-              <span class="text-gray-400">No image</span>
-            </div>
-            {{end}}
-          </div>
+          Products
+        </h2>
+        <!-- Placeholder for Future Category Filter -->
+        <div class="hidden sm:flex space-x-2">
+          <!-- This would be populated with product categories in future -->
+        </div>
+      </div>
 
-          <!-- Product Info - Flex Grow to Fill Available Height -->
-          <div class="p-5 flex-grow flex flex-col">
-            <div class="flex items-start justify-between">
-              <h3
-                class="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors"
+      {{if .Products}}
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+      >
+        {{range .Products}}
+        <a href="/product/view/{{.ID}}" class="group">
+          <div
+            class="bg-white/90 backdrop-blur-md rounded-2xl shadow-md overflow-hidden transition-all duration-300 transform hover:shadow-lg hover:-translate-y-1 flex flex-col"
+          >
+            <!-- Product Image -->
+            <div
+              class="w-full h-48 sm:h-56 overflow-hidden bg-gray-100 rounded-t-2xl"
+            >
+              {{if .ImagePath}}
+              <img
+                src="{{.ImagePath}}"
+                alt="{{.Name}}"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              {{else}}
+              <div
+                class="w-full h-full flex items-center justify-center bg-gray-200"
               >
-                {{.Name}}
-              </h3>
-              <span class="text-lg font-bold text-indigo-600"
-                >${{printf "%.2f" .Price}}</span
-              >
+                <span
+                  class="text-gray-400 text-sm"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  No image
+                </span>
+              </div>
+              {{end}}
             </div>
 
-            <p class="mt-2 text-gray-600 line-clamp-2 text-sm">
-              {{.Description}}
-            </p>
+            <!-- Product Info -->
+            <div class="p-4 sm:p-5 flex flex-col">
+              <div class="flex items-start justify-between">
+                <h3
+                  class="text-base sm:text-lg font-semibold text-gray-900 group-hover:text-teal-600 transition-colors line-clamp-1"
+                  style="font-family: &quot;Poppins&quot;, sans-serif"
+                >
+                  {{.Name}}
+                </h3>
+                <span
+                  class="text-base sm:text-lg font-bold text-teal-600"
+                  style="font-family: &quot;Poppins&quot;, sans-serif"
+                >
+                  ${{printf "%.2f" .Price}}
+                </span>
+              </div>
 
-            <!-- Push tags and view details to bottom with flex -->
-            <div class="mt-auto pt-4">
-              <div class="flex flex-wrap gap-2 mb-4">
+              <p
+                class="mt-1 sm:mt-2 text-gray-600 line-clamp-2 text-sm"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                {{.Description}}
+              </p>
+
+              <div class="mt-3 sm:mt-4 flex flex-wrap gap-2">
                 {{if .HasDelivery}}
                 <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
                 >
                   <svg
                     class="h-3 w-3 mr-1"
@@ -366,7 +518,8 @@
                 </span>
                 {{end}} {{if .HasPickup}}
                 <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
                 >
                   <svg
                     class="h-3 w-3 mr-1"
@@ -385,56 +538,95 @@
                 </span>
                 {{end}}
               </div>
-
-              <div class="text-right">
-                <span
-                  class="inline-flex items-center text-sm font-medium text-indigo-600 group-hover:text-indigo-800 transition-colors"
-                >
-                  View details
-                  <svg
-                    class="ml-1 h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M14 5l7 7m0 0l-7 7m7-7H3"
-                    />
-                  </svg>
-                </span>
-              </div>
             </div>
           </div>
-        </div>
-      </a>
+        </a>
+        {{end}}
+      </div>
+      {{else}}
+      <div
+        class="bg-white/90 backdrop-blur-md rounded-2xl shadow-md p-12 text-center"
+      >
+        <svg
+          class="h-12 w-12 text-teal-300 mx-auto"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+          />
+        </svg>
+        <h3
+          class="mt-3 text-lg font-medium text-gray-900"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          No products available yet
+        </h3>
+        <p
+          class="mt-2 text-gray-500"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >
+          Check back later for updates from this store.
+        </p>
+      </div>
       {{end}}
     </div>
-  </div>
-  {{else}}
-  <div class="mt-8 rounded-xl bg-white shadow-sm p-12 text-center">
-    <svg
-      class="h-12 w-12 text-gray-400 mx-auto"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
+
+    <!-- Floating Action Button (Optional Secondary Option) -->
+    <button
+      onclick="document.getElementById('contact-modal').classList.remove('hidden');"
+      class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-30 flex items-center px-4 py-3 sm:px-5 sm:py-4 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-300"
+      style="font-family: &quot;Inter&quot;, sans-serif"
     >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-      />
-    </svg>
-    <h3 class="mt-3 text-lg font-medium text-gray-900">
-      No products available yet
-    </h3>
-    <p class="mt-2 text-gray-500">
-      Check back later for updates from this store.
-    </p>
+      <svg
+        class="h-5 w-5 sm:h-6 sm:w-6 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+        />
+      </svg>
+      Contact Store
+    </button>
   </div>
-  {{end}}
 </div>
+
+<style>
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-down {
+    animation: fade-in-down 0.8s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+</style>
 {{end}}
