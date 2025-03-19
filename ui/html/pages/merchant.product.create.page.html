@@ -140,9 +140,10 @@
               id="image"
               accept="image/*"
               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
-              onchange="if(validateFileSize(this)) previewImage(this)"
+              onchange="const isValid = validateFileSize(this); if(isValid) { previewImage(this); }"
               style="font-family: &quot;Inter&quot;, sans-serif"
             />
+            <div id="file-error-container" class="hidden"></div>
             <p
               class="mt-2 text-sm text-gray-500"
               style="font-family: &quot;Inter&quot;, sans-serif"
@@ -335,32 +336,78 @@
       reader.readAsDataURL(input.files[0]);
     }
   }
-  // Add this to merchant.product.create.page.html inside the <script> tags
   function validateFileSize(input) {
+    // Clear any existing error messages
+    const errorContainer = document.getElementById("file-error-container");
+    if (errorContainer) {
+      errorContainer.innerHTML = "";
+      errorContainer.classList.add("hidden");
+    }
+
     // Check if a file was selected
     if (!input.files || input.files.length === 0) {
-      return true; // No file selected, validation passes
+      return true;
     }
 
     const fileSize = input.files[0].size / 1024 / 1024; // in MB
     console.log("File size: " + fileSize + "MB");
 
-    if (fileSize > 5) {
-      alert(
-        "File size exceeds 5MB. Please choose a smaller image or compress this one.",
-      );
-      input.value = ""; // Clear the input
-
-      // Reset the preview
-      const preview = document.getElementById("preview");
-      const placeholder = document.getElementById("placeholder");
-      if (preview && placeholder) {
-        preview.classList.add("hidden");
-        placeholder.classList.remove("hidden");
+    // Use 4.9MB as threshold
+    if (fileSize > 4.9) {
+      // Show inline error instead of alert
+      if (errorContainer) {
+        errorContainer.innerHTML = `
+                <div class="rounded-md bg-red-50 p-3 mt-2">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700">
+                                File size exceeds 5MB limit. Please choose a smaller image or compress this one.
+                            </p>
+                        </div>
+                    </div>
+                </div>`;
+        errorContainer.classList.remove("hidden");
       }
+
+      // Clear the input and reset preview
+      input.value = "";
+      resetPreview();
       return false;
     }
     return true;
+  }
+
+  // Add a separate function to reset the preview
+  function resetPreview() {
+    const preview = document.getElementById("preview");
+    const placeholder = document.getElementById("placeholder");
+    if (preview && placeholder) {
+      preview.classList.add("hidden");
+      placeholder.classList.remove("hidden");
+    }
+  }
+
+  function previewImage(input) {
+    const preview = document.getElementById("preview");
+    const placeholder = document.getElementById("placeholder");
+
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.classList.remove("hidden");
+        placeholder.classList.add("hidden");
+      };
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      // If no files, reset preview
+      resetPreview();
+    }
   }
 </script>
 {{end}}
