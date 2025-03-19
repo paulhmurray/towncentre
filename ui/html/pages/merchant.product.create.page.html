@@ -140,14 +140,22 @@
               id="image"
               accept="image/*"
               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
-              onchange="previewImage(this)"
+              onchange="if(validateFileSize(this)) previewImage(this)"
               style="font-family: &quot;Inter&quot;, sans-serif"
             />
             <p
               class="mt-2 text-sm text-gray-500"
               style="font-family: &quot;Inter&quot;, sans-serif"
             >
-              PNG, JPG, GIF up to 5MB
+              PNG, JPG, GIF up to 5MB. For best results, use images at least
+              800x800px.
+              <a
+                href="https://squoosh.app"
+                target="_blank"
+                class="text-teal-600 hover:text-teal-800 underline"
+              >
+                Need to compress an image?
+              </a>
             </p>
           </div>
         </div>
@@ -326,6 +334,19 @@
       };
       reader.readAsDataURL(input.files[0]);
     }
+  }
+  // Add this to merchant.product.create.page.html inside the <script> tags
+  function validateFileSize(input) {
+    const fileSize = input.files[0].size / 1024 / 1024; // in MB
+    if (fileSize > 5) {
+      alert(
+        "File size exceeds 5MB. Please choose a smaller image or compress this one.",
+      );
+      input.value = ""; // Clear the input
+      document.getElementById("preview").src = "/api/placeholder/128/128";
+      return false;
+    }
+    return true;
   }
 </script>
 {{end}}

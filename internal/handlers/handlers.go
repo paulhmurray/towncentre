@@ -156,6 +156,25 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
+	if r.ContentLength > 5*1024*1024 {
+		if r.Header.Get("HX-Request") == "true" {
+			w.Write([]byte(`
+            <div class="rounded-md bg-red-50 p-4">
+                <div class="flex">
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">File too large</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <p>Image exceeds the 5MB limit. Please compress your image or choose a smaller one.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `))
+			return
+		}
+		http.Error(w, "Image file too large (max 5MB)", http.StatusRequestEntityTooLarge)
+		return
+	}
 
 	// Parse multipart form for file upload (5MB max)
 	r.ParseMultipartForm(5 << 20)
