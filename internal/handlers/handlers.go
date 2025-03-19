@@ -148,7 +148,7 @@ func (app *Application) MerchantProductCreate(w http.ResponseWriter, r *http.Req
 	app.render(w, r, http.StatusOK, "merchant.product.create.page.html", nil)
 }
 
-// MerchantProductCreate handler - processes the form submission
+// MerchantProductCreatePost handler - processes the form submission
 func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http.Request) {
 	// Get the merchant ID from the session
 	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
@@ -156,31 +156,32 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	if r.ContentLength > 5*1024*1024 {
+
+	// Parse multipart form for file upload (5MB max)
+	err := r.ParseMultipartForm(5 << 20)
+	if err != nil {
+		// This error occurs when the form size exceeds the limit
 		if r.Header.Get("HX-Request") == "true" {
 			w.Write([]byte(`
-            <div class="rounded-md bg-red-50 p-4">
-                <div class="flex">
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800">File too large</h3>
-                        <div class="mt-2 text-sm text-red-700">
-                            <p>Image exceeds the 5MB limit. Please compress your image or choose a smaller one.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `))
+			<div class="rounded-md bg-red-50 p-4">
+				<div class="flex">
+					<div class="ml-3">
+						<h3 class="text-sm font-medium text-red-800">File too large</h3>
+						<div class="mt-2 text-sm text-red-700">
+							<p>Image exceeds the 5MB limit. Please compress your image or choose a smaller one.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			`))
 			return
 		}
 		http.Error(w, "Image file too large (max 5MB)", http.StatusRequestEntityTooLarge)
 		return
 	}
 
-	// Parse multipart form for file upload (5MB max)
-	r.ParseMultipartForm(5 << 20)
-
-	// Parse form data first
-	err := r.ParseForm()
+	// Parse form data
+	err = r.ParseForm()
 	if err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
@@ -207,6 +208,28 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 	// Handle file upload
 	if file, header, err := r.FormFile("image"); err == nil {
 		defer file.Close()
+
+		// Check file size again (server-side)
+		fileSize := header.Size / (1024 * 1024) // size in MB
+		if fileSize > 5 {
+			if r.Header.Get("HX-Request") == "true" {
+				w.Write([]byte(`
+				<div class="rounded-md bg-red-50 p-4">
+					<div class="flex">
+						<div class="ml-3">
+							<h3 class="text-sm font-medium text-red-800">File too large</h3>
+							<div class="mt-2 text-sm text-red-700">
+								<p>Image exceeds the 5MB limit. Please compress your image or choose a smaller one.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				`))
+				return
+			}
+			http.Error(w, "Image file too large (max 5MB)", http.StatusRequestEntityTooLarge)
+			return
+		}
 
 		// Create unique filename
 		ext := filepath.Ext(header.Filename)
@@ -247,10 +270,6 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 		}
 	}
 
-	// Debug logging
-	//log.Printf("Product Image Path: %s", product.ImagePath)
-	//log.Printf("Product Thumbnail Path: %s", product.ThumbnailPath)
-
 	// Insert the product
 	err = app.Products.Insert(product)
 	if err != nil {
@@ -262,17 +281,17 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 	// Handle HTMX request
 	if r.Header.Get("HX-Request") == "true" {
 		w.Write([]byte(`
-            <div class="rounded-md bg-green-50 p-4">
-                <div class="flex">
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-green-800">Product Created Successfully</h3>
-                        <div class="mt-2 text-sm text-green-700">
-                            <p>Your product has been listed. <a href="/merchant/dashboard" class="font-medium text-green-800 hover:text-green-900">Return to Dashboard</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `))
+		<div class="rounded-md bg-green-50 p-4">
+			<div class="flex">
+				<div class="ml-3">
+					<h3 class="text-sm font-medium text-green-800">Product Created Successfully</h3>
+					<div class="mt-2 text-sm text-green-700">
+						<p>Your product has been listed. <a href="/merchant/dashboard" class="font-medium text-green-800 hover:text-green-900">Return to Dashboard</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+		`))
 		return
 	}
 
