@@ -1,0 +1,464 @@
+{{define "title"}}Service Dashboard - TownCentre{{end}} {{define "main"}}
+<div class="min-h-screen bg-gray-50">
+  <!-- Top Stats Section -->
+  <div class="bg-white/90 backdrop-blur-md shadow-sm">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <h1
+        class="text-3xl sm:text-4xl font-extrabold text-gray-900 animate-fade-in-down"
+        style="font-family: &quot;Poppins&quot;, sans-serif"
+      >
+        Service Dashboard
+      </h1>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+      <!-- Total Services -->
+      <div
+        class="bg-white/80 backdrop-blur-md overflow-hidden shadow rounded-2xl border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-teal-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt
+                  class="text-sm font-medium text-gray-600 truncate"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  Total Services
+                </dt>
+                <dd class="flex items-baseline">
+                  <div
+                    class="text-2xl font-semibold text-gray-900"
+                    style="font-family: &quot;Poppins&quot;, sans-serif"
+                  >
+                    {{if .Services}}{{len .Services}}{{else}}0{{end}}
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Views -->
+      <div
+        class="bg-white/80 backdrop-blur-md overflow-hidden shadow rounded-2xl border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-teal-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt
+                  class="text-sm font-medium text-gray-600 truncate"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  Total Views
+                </dt>
+                <dd class="flex items-baseline">
+                  <div
+                    class="text-2xl font-semibold text-gray-900"
+                    style="font-family: &quot;Poppins&quot;, sans-serif"
+                  >
+                    {{.TotalViews}}
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inquiries -->
+      <div
+        class="bg-white/80 backdrop-blur-md overflow-hidden shadow rounded-2xl border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-teal-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt
+                  class="text-sm font-medium text-gray-600 truncate"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  New Inquiries
+                </dt>
+                <dd class="flex items-baseline">
+                  <div
+                    class="text-2xl font-semibold text-gray-900"
+                    style="font-family: &quot;Poppins&quot;, sans-serif"
+                  >
+                    {{.UnreadMessageCount}}
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings - Coming Soon -->
+      <div
+        class="bg-white/80 backdrop-blur-md overflow-hidden shadow rounded-2xl border border-gray-100 transform hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-6 w-6 text-teal-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt
+                  class="text-sm font-medium text-gray-600 truncate"
+                  style="font-family: &quot;Inter&quot;, sans-serif"
+                >
+                  Bookings - Coming Soon
+                </dt>
+                <dd class="flex items-baseline">
+                  <div
+                    class="text-2xl font-semibold text-gray-900"
+                    style="font-family: &quot;Poppins&quot;, sans-serif"
+                  >
+                    0
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions and Recent Activity -->
+    <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <!-- Quick Actions -->
+      <div
+        class="bg-white/90 backdrop-blur-md overflow-hidden shadow rounded-2xl border border-gray-100"
+      >
+        <div class="p-6">
+          <h2
+            class="text-xl font-semibold text-gray-900 mb-4"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            Quick Actions
+          </h2>
+          <div class="grid grid-cols-2 gap-4">
+            <a
+              href="/merchant/service/create"
+              class="inline-flex items-center justify-center px-4 py-3 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 shadow-lg transform hover:scale-105 transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Add New Service
+            </a>
+            <a
+              href="/merchant/appointments"
+              class="inline-flex items-center justify-center px-4 py-3 border border-gray-200 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              View Appointments
+            </a>
+            <a
+              href="/merchant/messages"
+              class="inline-flex items-center justify-center px-4 py-3 border border-gray-200 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Messages
+            </a>
+            <a
+              href="/merchant/settings"
+              class="inline-flex items-center justify-center px-4 py-3 border border-gray-200 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Settings
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div
+        class="bg-white/90 backdrop-blur-md overflow-hidden shadow rounded-2xl border border-gray-100"
+      >
+        <div class="p-6">
+          <h2
+            class="text-xl font-semibold text-gray-900 mb-4"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            Recent Activity
+          </h2>
+          <div class="flow-root">
+            <ul class="-mb-8">
+              <li>
+                <div class="relative pb-8">
+                  <div class="relative flex space-x-3">
+                    <div>
+                      <span
+                        class="h-8 w-8 rounded-full bg-teal-500 flex items-center justify-center ring-8 ring-white"
+                      >
+                        <svg
+                          class="h-5 w-5 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                      </span>
+                    </div>
+                    <div
+                      class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4"
+                    >
+                      <div>
+                        <p
+                          class="text-sm text-gray-500"
+                          style="font-family: &quot;Inter&quot;, sans-serif"
+                        >
+                          Welcome to your
+                          <span class="font-medium text-gray-900"
+                            >Service Dashboard!</span
+                          >
+                          Start by adding your services.
+                        </p>
+                      </div>
+                      <div
+                        class="text-right text-sm whitespace-nowrap text-gray-500"
+                        style="font-family: &quot;Inter&quot;, sans-serif"
+                      >
+                        <time datetime="2025-01-29"></time>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <!-- Add more activity items as needed -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Services List -->
+    <div
+      class="mt-8 bg-white/90 backdrop-blur-md overflow-hidden shadow rounded-2xl border border-gray-100"
+    >
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2
+            class="text-xl font-semibold text-gray-900"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            Your Services
+          </h2>
+          <a
+            href="/merchant/service/create"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 shadow-lg transform hover:scale-105 transition-all duration-300"
+            style="font-family: &quot;Inter&quot;, sans-serif"
+          >
+            Add Service
+          </a>
+        </div>
+
+        {{if .Services}}
+        <div class="flow-root">
+          <ul role="list" class="divide-y divide-gray-200">
+            {{range .Services}}
+            <li class="py-5 hover:bg-gray-50 transition-all duration-300">
+              <div class="flex flex-col sm:flex-row">
+                <!-- Service Details -->
+                <div class="flex-1 flex flex-col">
+                  <div>
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <h3
+                          class="text-base font-semibold text-gray-900"
+                          style="font-family: &quot;Poppins&quot;, sans-serif"
+                        >
+                          {{.ServiceName}}
+                        </h3>
+                        <p
+                          class="mt-1 text-sm text-gray-500 line-clamp-2"
+                          style="font-family: &quot;Inter&quot;, sans-serif"
+                        >
+                          {{.Description}}
+                        </p>
+                      </div>
+                      <div
+                        class="ml-4 flex-shrink-0 text-base font-semibold text-gray-900"
+                        style="font-family: &quot;Poppins&quot;, sans-serif"
+                      >
+                        {{.FormattedPrice}}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Additional Info and Actions -->
+                  <div class="mt-4 flex items-center justify-between">
+                    <div class="flex space-x-2">
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                        style="font-family: &quot;Inter&quot;, sans-serif"
+                      >
+                        {{.Category}}
+                      </span>
+                      {{if .Availability}}
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                        style="font-family: &quot;Inter&quot;, sans-serif"
+                      >
+                        {{.Availability}}
+                      </span>
+                      {{end}}
+                    </div>
+                    <div class="flex space-x-4">
+                      <a
+                        href="/merchant/service/edit/{{.ID}}"
+                        class="text-sm font-medium text-teal-500 hover:text-teal-600 transition-all duration-300"
+                        style="font-family: &quot;Inter&quot;, sans-serif"
+                      >
+                        Edit
+                      </a>
+                      <button
+                        hx-delete="/merchant/service/delete/{{.ID}}"
+                        hx-confirm="Are you sure you want to delete this service?"
+                        class="text-sm font-medium text-red-500 hover:text-red-600 transition-all duration-300"
+                        style="font-family: &quot;Inter&quot;, sans-serif"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            {{end}}
+          </ul>
+        </div>
+        {{else}}
+        <!-- Empty State for Services -->
+        <div class="text-center py-12">
+          <h3
+            class="mt-2 text-lg font-semibold text-gray-900"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            No services
+          </h3>
+          <p
+            class="mt-1 text-sm text-gray-500"
+            style="font-family: &quot;Inter&quot;, sans-serif"
+          >
+            Get started by creating a new service.
+          </p>
+          <div class="mt-6">
+            <a
+              href="/merchant/service/create"
+              class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 shadow-lg transform hover:scale-105 transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              <svg
+                class="mr-2 -ml-1 h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Add Service
+            </a>
+          </div>
+        </div>
+        {{end}}
+      </div>
+    </div>
+
+    <style>
+      @keyframes fade-in-down {
+        0% {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .animate-fade-in-down {
+        animation: fade-in-down 0.8s ease-out forwards;
+      }
+    </style>
+  </div>
+</div>
+{{end}}

@@ -1,0 +1,646 @@
+{{define "title"}}{{.Store.StoreName}} - TownCentre{{end}} {{define "main"}}
+<div class="relative min-h-screen bg-gray-50">
+  <!-- Hero Background -->
+  <div
+    class="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-teal-100/30 to-blue-100/30 z-0"
+  ></div>
+
+  <!-- Main Content -->
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 z-10">
+    <!-- Store Header -->
+    <div class="text-center mb-8">
+      <div class="flex justify-center mb-4">
+        <div
+          class="relative rounded-full bg-white/90 backdrop-blur-md shadow-lg overflow-hidden w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center border-4 border-gray-100 ring-2 ring-teal-100 transform hover:scale-105 transition-all duration-300"
+        >
+          {{if .Store.LogoPath}}
+          <img
+            src="{{.Store.LogoPath}}"
+            alt="{{.Store.StoreName}} logo"
+            class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          />
+          {{else}}
+          <div class="text-center p-4">
+            <svg
+              class="h-12 w-12 sm:h-16 sm:w-16 text-teal-300 mx-auto"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+            <p
+              class="mt-2 text-xs text-gray-500"
+              style="font-family: 'Inter', sans-serif'"
+            >
+              No logo uploaded
+            </p>
+          </div>
+          {{end}}
+        </div>
+      </div>
+      <h1
+        class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 animate-fade-in-down"
+        style="font-family: 'Poppins', sans-serif'"
+      >
+        {{.Store.StoreName}}
+      </h1>
+      <span
+        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800 mt-3 shadow-sm animate-fade-in-up"
+        style="font-family: 'Inter', sans-serif'"
+      >
+        {{.Store.BusinessType}}
+      </span>
+    </div>
+
+    <!-- About Section -->
+    <div
+      class="bg-white/90 backdrop-blur-md rounded-2xl shadow-md overflow-hidden mb-8"
+    >
+      <div class="p-6 sm:p-8">
+        <div class="flex items-center mb-4">
+          <svg
+            class="h-8 w-8 text-teal-600 mr-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h2
+            class="text-xl sm:text-2xl font-extrabold text-gray-900"
+            style="font-family: 'Poppins', sans-serif'"
+          >
+            About {{.Store.StoreName}}
+          </h2>
+        </div>
+        {{if .Store.Description}}
+        <p
+          class="text-base text-gray-600 leading-relaxed"
+          style="font-family: 'Inter', sans-serif'"
+        >
+          {{.Store.Description}}
+        </p>
+        {{else}}
+        <p
+          class="text-base text-gray-600 italic"
+          style="font-family: 'Inter', sans-serif'"
+        >
+          This business hasn’t provided a description yet. Contact them to learn
+          more about their services.
+        </p>
+        {{end}}
+      </div>
+    </div>
+
+    <!-- Business Details Section -->
+    <div
+      class="bg-white/90 backdrop-blur-md rounded-2xl shadow-md overflow-hidden mb-8"
+    >
+      <div class="p-6 sm:p-8">
+        <div class="flex items-center mb-4">
+          <svg
+            class="h-8 w-8 text-teal-600 mr-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+            />
+          </svg>
+          <h2
+            class="text-xl sm:text-2xl font-extrabold text-gray-900"
+            style="font-family: 'Poppins', sans-serif'"
+          >
+            Business Details
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Location Info -->
+          {{if .Store.Location}}
+          <div class="flex items-start">
+            <div class="flex-shrink-0 bg-teal-100 p-3 rounded-full">
+              <svg
+                class="h-6 w-6 text-teal-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3
+                class="text-base font-medium text-gray-900"
+                style="font-family: 'Poppins', sans-serif'"
+              >
+                Location
+              </h3>
+              <p
+                class="mt-1 text-sm text-gray-600"
+                style="font-family: 'Inter', sans-serif'"
+              >
+                {{.Store.Location}}
+              </p>
+            </div>
+          </div>
+          {{end}}
+
+          <!-- Contact Info -->
+          {{if .Store.Phone}}
+          <div class="flex items-start">
+            <div class="flex-shrink-0 bg-teal-100 p-3 rounded-full">
+              <svg
+                class="h-6 w-6 text-teal-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3
+                class="text-base font-medium text-gray-900"
+                style="font-family: 'Poppins', sans-serif'"
+              >
+                Contact
+              </h3>
+              <p
+                class="mt-1 text-sm text-gray-600"
+                style="font-family: 'Inter', sans-serif'"
+              >
+                {{.Store.Phone}}
+              </p>
+            </div>
+          </div>
+          {{end}}
+
+          <!-- Availability -->
+          {{if .Store.OpeningHours}}
+          <div class="flex items-start">
+            <div class="flex-shrink-0 bg-teal-100 p-3 rounded-full">
+              <svg
+                class="h-6 w-6 text-teal-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3
+                class="text-base font-medium text-gray-900"
+                style="font-family: 'Poppins', sans-serif'"
+              >
+                Availability
+              </h3>
+              <p
+                class="mt-1 text-sm text-gray-600"
+                style="font-family: 'Inter', sans-serif'"
+              >
+                {{.Store.OpeningHours}}
+              </p>
+            </div>
+          </div>
+          {{end}}
+        </div>
+
+        <!-- Contact Business Button -->
+        <div class="mt-6">
+          <button
+            onclick="document.getElementById('contact-modal').classList.remove('hidden');"
+            class="w-full sm:w-auto flex items-center px-4 py-2 sm:px-5 sm:py-3 border border-transparent text-sm sm:text-base font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-300"
+            style="font-family: 'Inter', sans-serif'"
+          >
+            <svg
+              class="h-4 w-4 sm:h-5 sm:w-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+              />
+            </svg>
+            Contact Business
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Services Section -->
+    <div>
+      <div class="flex items-center justify-between mb-6">
+        <h2
+          class="text-2xl sm:text-3xl font-extrabold text-gray-900"
+          style="font-family: 'Poppins', sans-serif'"
+        >
+          Our Services
+        </h2>
+        <!-- Placeholder for Future Category Filter -->
+        <div class="hidden sm:flex space-x-2">
+          <!-- This would be populated with service categories in future -->
+        </div>
+      </div>
+
+      {{if .Services}}
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+      >
+        {{range .Services}}
+        <div
+          class="bg-white/90 backdrop-blur-md rounded-2xl shadow-md overflow-hidden transition-all duration-300 transform hover:shadow-lg hover:-translate-y-1 flex flex-col"
+        >
+          <!-- Service Info -->
+          <div class="p-5 sm:p-6 flex flex-col h-full">
+            <div class="flex items-start justify-between mb-3">
+              <h3
+                class="text-lg sm:text-xl font-semibold text-gray-900"
+                style="font-family: 'Poppins', sans-serif'"
+              >
+                {{.ServiceName}}
+              </h3>
+              <span
+                class="text-base sm:text-lg font-bold text-teal-600"
+                style="font-family: 'Poppins', sans-serif'"
+              >
+                {{.FormattedPrice}}
+              </span>
+            </div>
+            <p
+              class="text-sm text-gray-600 flex-grow leading-snug"
+              style="font-family: 'Inter', sans-serif'"
+            >
+              {{.Description}}
+            </p>
+            <div class="mt-4 space-y-3">
+              {{if .ServiceArea}}
+              <div class="flex items-center">
+                <svg
+                  class="h-5 w-5 text-teal-600 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <p
+                  class="text-sm text-gray-600"
+                  style="font-family: 'Inter', sans-serif'"
+                >
+                  Service Area: {{.ServiceArea}}
+                </p>
+              </div>
+              {{end}} {{if .Availability}}
+              <div class="flex items-center">
+                <svg
+                  class="h-5 w-5 text-teal-600 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <p
+                  class="text-sm text-gray-600"
+                  style="font-family: 'Inter', sans-serif'"
+                >
+                  Availability: {{.Availability}}
+                </p>
+              </div>
+              {{end}} {{if .Category}}
+              <div class="flex items-center">
+                <svg
+                  class="h-5 w-5 text-teal-600 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M7 7h10a2 2 0 012 2v6a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 9l4-4m0 0l4 4m-4-4v12"
+                  />
+                </svg>
+                <p
+                  class="text-sm text-gray-600"
+                  style="font-family: 'Inter', sans-serif'"
+                >
+                  Category: {{.Category}}
+                </p>
+              </div>
+              {{end}}
+            </div>
+            <div class="mt-4">
+              <button
+                onclick="document.getElementById('contact-modal').classList.remove('hidden');"
+                class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-300"
+                style="font-family: 'Inter', sans-serif'"
+              >
+                Request Info
+              </button>
+            </div>
+          </div>
+        </div>
+        {{end}}
+      </div>
+      {{else}}
+      <div
+        class="bg-white/90 backdrop-blur-md rounded-2xl shadow-md p-12 text-center"
+      >
+        <svg
+          class="h-12 w-12 text-teal-300 mx-auto"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          />
+        </svg>
+        <h3
+          class="mt-3 text-lg font-medium text-gray-900"
+          style="font-family: 'Poppins', sans-serif'"
+        >
+          No services available yet
+        </h3>
+        <p class="mt-2 text-gray-500" style="font-family: 'Inter', sans-serif'">
+          Check back later for service offerings from this provider.
+        </p>
+      </div>
+      {{end}}
+    </div>
+
+    <!-- Contact Modal -->
+    <div
+      id="contact-modal"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+    >
+      <div
+        class="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl w-full max-w-lg mx-4 p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2
+            class="text-2xl sm:text-3xl font-extrabold text-gray-900"
+            style="font-family: 'Poppins', sans-serif'"
+          >
+            Request Information
+          </h2>
+          <button
+            onclick="document.getElementById('contact-modal').classList.add('hidden');"
+            class="text-gray-400 hover:text-gray-500 p-2 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <svg
+              class="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <form
+          hx-post="/store/{{.Store.ID}}/message"
+          hx-swap="outerHTML"
+          class="space-y-4"
+        >
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label
+                for="name"
+                class="block text-sm font-medium text-gray-700"
+                style="font-family: 'Inter', sans-serif'"
+              >
+                Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                required
+                class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+                minlength="2"
+                maxlength="50"
+                style="font-family: 'Inter', sans-serif'"
+              />
+            </div>
+
+            <div>
+              <label
+                for="email"
+                class="block text-sm font-medium text-gray-700"
+                style="font-family: 'Inter', sans-serif'"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+                style="font-family: 'Inter', sans-serif'"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="phone"
+              class="block text-sm font-medium text-gray-700"
+              style="font-family: 'Inter', sans-serif'"
+            >
+              Phone (optional)
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              id="phone"
+              class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              style="font-family: 'Inter', sans-serif'"
+            />
+          </div>
+
+          <div>
+            <label
+              for="message"
+              class="block text-sm font-medium text-gray-700"
+              style="font-family: 'Inter', sans-serif'"
+            >
+              Message
+            </label>
+            <textarea
+              name="message"
+              id="message"
+              rows="4"
+              required
+              class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              minlength="10"
+              maxlength="1000"
+              placeholder="What service are you interested in? Please provide details about your requirements."
+              style="font-family: 'Inter', sans-serif'"
+            ></textarea>
+            <p
+              class="mt-1 text-sm text-gray-500"
+              style="font-family: 'Inter', sans-serif'"
+            >
+              Maximum 1000 characters
+            </p>
+          </div>
+
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-300"
+              style="font-family: 'Inter', sans-serif'"
+            >
+              <svg
+                class="h-5 w-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
+              </svg>
+              Send Inquiry
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button
+      onclick="document.getElementById('contact-modal').classList.remove('hidden');"
+      class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-30 flex items-center px-4 py-3 sm:px-5 sm:py-4 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-300"
+      style="font-family: 'Inter', sans-serif'"
+    >
+      <svg
+        class="h-5 w-5 sm:h-6 sm:w-6 mr-2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+        />
+      </svg>
+      Contact
+    </button>
+  </div>
+</div>
+
+<style>
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-down {
+    animation: fade-in-down 0.8s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+  }
+</style>
+{{end}}

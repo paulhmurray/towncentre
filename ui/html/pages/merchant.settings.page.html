@@ -198,6 +198,32 @@
             />
           </div>
 
+          <!-- Phone -->
+          <div class="space-y-2">
+            <label
+              for="phone"
+              class="block text-sm font-medium text-gray-900"
+              style="font-family: &quot;Poppins&quot;, sans-serif"
+            >
+              Phone Number
+            </label>
+            <p
+              class="text-sm text-gray-500"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            >
+              Provide a contact number for customers to reach you (optional).
+            </p>
+            <input
+              type="tel"
+              name="phone"
+              id="phone"
+              value="{{.Merchant.Phone}}"
+              class="mt-1 block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+              placeholder="e.g., 123-456-7890"
+            />
+          </div>
+
           <!-- Opening Hours -->
           <div class="space-y-2">
             <label

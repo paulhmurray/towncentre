@@ -1,0 +1,337 @@
+{{define "title"}}Edit Service - TownCentre{{end}} 
+{{define "main"}}
+<div class="relative min-h-screen bg-gray-50">
+  <!-- Hero Background -->
+  <div
+    class="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-teal-100/30 to-blue-100/30 z-0"
+  ></div>
+
+  <!-- Main Content -->
+  <div class="relative max-w-2xl mx-auto px-4 sm:px-6 py-6 z-10">
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+      <h2
+        class="text-3xl sm:text-4xl font-extrabold text-gray-900 animate-fade-in-down"
+        style="font-family: &quot;Poppins&quot;, sans-serif"
+      >
+        Edit Service
+      </h2>
+      <div class="mt-4 flex justify-center">
+        <a
+          href="/merchant/services"
+          class="inline-flex items-center px-4 py-2 border border-gray-200 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white/90 backdrop-blur-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >
+          <svg
+            class="h-5 w-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Back to Services
+        </a>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form
+      hx-post="/merchant/service/edit/{{.Service.ID}}"
+      hx-swap="outerHTML"
+      class="space-y-6 bg-white/90 backdrop-blur-md rounded-2xl shadow-lg p-6"
+    >
+      <!-- Service Name -->
+      <div>
+        <label
+          for="service_name"
+          class="block text-sm font-medium text-gray-700"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Service Name
+        </label>
+        <input
+          type="text"
+          name="service_name"
+          id="service_name"
+          required
+          value="{{.Service.ServiceName}}"
+          placeholder="e.g., Plumbing Repair"
+          class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        />
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label
+          for="description"
+          class="block text-sm font-medium text-gray-700"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Description
+        </label>
+        <textarea
+          name="description"
+          id="description"
+          rows="4"
+          required
+          placeholder="Describe your service..."
+          class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >{{.Service.Description}}</textarea>
+      </div>
+
+      <!-- Category -->
+      <div>
+        <label
+          for="category"
+          class="block text-sm font-medium text-gray-700"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Category
+        </label>
+        <select
+          name="category"
+          id="category"
+          required
+          class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        >
+          <option value="">Select a category</option>
+          {{range .ServiceCategories}}
+          <option value="{{.Name}}" {{if eq .Name $.Service.Category}}selected{{end}}>{{.Name}}</option>
+          {{end}}
+        </select>
+      </div>
+
+      <!-- Pricing Type -->
+      <div>
+        <label
+          for="price_type"
+          class="block text-sm font-medium text-gray-700"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Pricing Type
+        </label>
+        <select
+          name="price_type"
+          id="price_type"
+          required
+          class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+          onchange="togglePriceFields()"
+        >
+          <option value="">Select pricing type</option>
+          <option value="fixed" {{if eq .Service.PriceType "fixed"}}selected{{end}}>Fixed Price</option>
+          <option value="hourly" {{if eq .Service.PriceType "hourly"}}selected{{end}}>Hourly Rate</option>
+          <option value="range" {{if eq .Service.PriceType "range"}}selected{{end}}>Price Range</option>
+          <option value="quote" {{if eq .Service.PriceType "quote"}}selected{{end}}>Quote on Request</option>
+          <option value="free" {{if eq .Service.PriceType "free"}}selected{{end}}>Free</option>
+        </select>
+      </div>
+
+      <!-- Price Fields -->
+      <div id="price_fields" class="space-y-4 {{if not (or (eq .Service.PriceType "fixed") (eq .Service.PriceType "hourly") (eq .Service.PriceType "range"))}}hidden{{end}}">
+        <div id="price_from_container" class="{{if not (or (eq .Service.PriceType "fixed") (eq .Service.PriceType "hourly") (eq .Service.PriceType "range"))}}hidden{{end}}">
+          <label
+            for="price_from"
+            class="block text-sm font-medium text-gray-700"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            <span id="price_from_label">
+              {{if eq .Service.PriceType "fixed"}}Price
+              {{else if eq .Service.PriceType "hourly"}}Hourly Rate
+              {{else if eq .Service.PriceType "range"}}Minimum Price
+              {{else}}Price{{end}}
+            </span>
+          </label>
+          <div class="mt-1 relative rounded-xl shadow-sm">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <span
+                class="text-gray-500 sm:text-sm"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                $
+              </span>
+            </div>
+            <input
+              type="number"
+              name="price_from"
+              id="price_from"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+              value="{{if .Service.PriceFrom}}{{.Service.PriceFrom}}{{end}}"
+              class="mt-1 block w-full pl-7 pr-3 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            />
+          </div>
+        </div>
+
+        <div id="price_to_container" class="{{if ne .Service.PriceType "range"}}hidden{{end}}">
+          <label
+            for="price_to"
+            class="block text-sm font-medium text-gray-700"
+            style="font-family: &quot;Poppins&quot;, sans-serif"
+          >
+            Maximum Price
+          </label>
+          <div class="mt-1 relative rounded-xl shadow-sm">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <span
+                class="text-gray-500 sm:text-sm"
+                style="font-family: &quot;Inter&quot;, sans-serif"
+              >
+                $
+              </span>
+            </div>
+            <input
+              type="number"
+              name="price_to"
+              id="price_to"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+              value="{{if .Service.PriceTo}}{{.Service.PriceTo}}{{end}}"
+              class="mt-1 block w-full pl-7 pr-3 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              style="font-family: &quot;Inter&quot;, sans-serif"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Availability -->
+      <div>
+        <label
+          for="availability"
+          class="block text-sm font-medium text-gray-700"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Availability
+        </label>
+        <input
+          type="text"
+          name="availability"
+          id="availability"
+          placeholder="e.g., Mon-Fri, 9am-5pm"
+          value="{{.Service.Availability}}"
+          class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        />
+      </div>
+
+      <!-- Service Area -->
+      <div>
+        <label
+          for="service_area"
+          class="block text-sm font-medium text-gray-700"
+          style="font-family: &quot;Poppins&quot;, sans-serif"
+        >
+          Service Area
+        </label>
+        <input
+          type="text"
+          name="service_area"
+          id="service_area"
+          placeholder="e.g., Ballarat and surrounding suburbs"
+          value="{{.Service.ServiceArea}}"
+          class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+          style="font-family: &quot;Inter&quot;, sans-serif"
+        />
+      </div>
+
+      <!-- Submit Button -->
+      <div class="pt-5">
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-base font-medium text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+            style="font-family: &quot;Inter&quot;, sans-serif"
+          >
+            <svg
+              class="h-5 w-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Update Service
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-down {
+    animation: fade-in-down 0.8s ease-out forwards;
+  }
+</style>
+
+<script>
+  function togglePriceFields() {
+    const priceType = document.getElementById("price_type").value;
+    const priceFields = document.getElementById("price_fields");
+    const priceFromContainer = document.getElementById("price_from_container");
+    const priceToContainer = document.getElementById("price_to_container");
+    const priceFromLabel = document.getElementById("price_from_label");
+    const priceFromInput = document.getElementById("price_from");
+    const priceToInput = document.getElementById("price_to");
+
+    priceFields.classList.add("hidden");
+    priceFromContainer.classList.add("hidden");
+    priceToContainer.classList.add("hidden");
+    priceFromInput.required = false;
+    priceToInput.required = false;
+
+    if (priceType === "fixed") {
+      priceFields.classList.remove("hidden");
+      priceFromContainer.classList.remove("hidden");
+      priceFromLabel.textContent = "Price";
+      priceFromInput.required = true;
+    } else if (priceType === "hourly") {
+      priceFields.classList.remove("hidden");
+      priceFromContainer.classList.remove("hidden");
+      priceFromLabel.textContent = "Hourly Rate";
+      priceFromInput.required = true;
+    } else if (priceType === "range") {
+      priceFields.classList.remove("hidden");
+      priceFromContainer.classList.remove("hidden");
+      priceToContainer.classList.remove("hidden");
+      priceFromLabel.textContent = "Minimum Price";
+      priceFromInput.required = true;
+      priceToInput.required = true;
+    }
+  }
+
+  // Run on page load to ensure correct initial state
+  document.addEventListener("DOMContentLoaded", togglePriceFields);
+</script>
+{{end}}

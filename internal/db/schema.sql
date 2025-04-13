@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS merchants (
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(50),
     business_type VARCHAR(50) NOT NULL,
+    business_model ENUM('product', 'service', 'hybrid') NOT NULL DEFAULT 'product',
     location VARCHAR(255),
     opening_hours TEXT,
     password_hash BINARY(60) NOT NULL,
@@ -77,3 +78,51 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 
 -- Index for faster token lookups
 CREATE INDEX IF NOT EXISTS idx_reset_token ON password_reset_tokens(token);
+
+-- Create services table
+CREATE TABLE IF NOT EXISTS services (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    merchant_id BIGINT UNSIGNED NOT NULL,
+    service_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100) NOT NULL,
+    price_type ENUM('fixed', 'hourly', 'quote', 'range', 'free') NOT NULL,
+    price_from DECIMAL(10,2),
+    price_to DECIMAL(10,2),
+    availability TEXT,
+    service_area TEXT,
+    is_featured BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (merchant_id) REFERENCES merchants(id)
+);
+
+-- Create service_categories table
+CREATE TABLE IF NOT EXISTS service_categories (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    slug VARCHAR(100) NOT NULL UNIQUE,
+    icon VARCHAR(50),
+    display_order INT DEFAULT 0
+);
+
+-- Insert common service categories
+INSERT INTO service_categories (name, slug, icon, display_order) VALUES
+('Plumbing', 'plumbing', 'pipe', 10),
+('Electrical', 'electrical', 'lightning', 20),
+('Cleaning', 'cleaning', 'sparkles', 30),
+('Gardening', 'gardening', 'flower', 40),
+('Home Maintenance', 'home-maintenance', 'house', 50),
+('Consulting', 'consulting', 'briefcase', 60),
+('Health & Wellness', 'health-wellness', 'heartbeat', 70),
+('Education & Tutoring', 'education', 'book', 80),
+('Legal', 'legal', 'scale', 90),
+('Automotive', 'automotive', 'car', 100);
+
+-- Modify merchants table to support service businesses
+ALTER TABLE merchants 
+ADD COLUMN business_type_detail VARCHAR(100) AFTER business_type,
+ADD COLUMN service_areas TEXT AFTER location,
+ADD COLUMN qualifications TEXT AFTER service_areas,
+ADD COLUMN years_experience INT AFTER qualifications,
+ADD COLUMN license_info VARCHAR(255) AFTER years_experience;

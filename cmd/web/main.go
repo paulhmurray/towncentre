@@ -95,14 +95,20 @@ func main() {
 	// Initialis the store view model
 	storeViews := &models.StoreViewModel{DB: db}
 
+	//Initialise the service models
+	services := &models.ServiceModel{DB: db}
+	serviceCategories := &models.ServiceCategoryModel{DB: db}
+
 	app := &handlers.Application{
-		TemplateCache: templateCache,
-		DB:            db,
-		Merchants:     merchants,
-		Products:      products,
-		Sessions:      sessionManager,
-		Messages:      &models.MessageModel{DB: db},
-		StoreViews:    storeViews,
+		TemplateCache:     templateCache,
+		DB:                db,
+		Merchants:         merchants,
+		Products:          products,
+		Sessions:          sessionManager,
+		Messages:          &models.MessageModel{DB: db},
+		StoreViews:        storeViews,
+		Services:          services,
+		ServiceCategories: serviceCategories,
 	}
 	mux := http.NewServeMux()
 
@@ -144,8 +150,11 @@ func main() {
 	mux.Handle("GET /static/", http.StripPrefix("/static", staticServer))
 
 	// Authentication routes with combined middleware
+	//Reg
 	mux.Handle("GET /merchant/register", combinedMiddleware(app.MerchantRegister))
 	mux.Handle("POST /merchant/register", combinedMiddleware(app.MerchantRegister))
+	mux.Handle("GET /merchant/business-categories", sessionManager.LoadAndSave(http.HandlerFunc(app.BusinessCategories)))
+
 	mux.Handle("GET /merchant/dashboard", combinedMiddleware(app.MerchantDashboard))
 	mux.Handle("GET /merchant/login", combinedMiddleware(app.MerchantLogin))
 	mux.Handle("POST /merchant/login", combinedMiddleware(app.MerchantLogin))
@@ -165,6 +174,14 @@ func main() {
 	// no auth required for Terms, minimal middleware for CheckBusinessType)
 	mux.Handle("GET /terms", combinedMiddleware(app.Terms))
 	mux.Handle("GET /merchant/check-business-type", sessionManager.LoadAndSave(http.HandlerFunc(app.CheckBusinessType)))
+
+	//Services
+	mux.Handle("GET /merchant/services", combinedMiddleware(app.MerchantServicesView))
+	mux.Handle("GET /merchant/service-dashboard", combinedMiddleware(app.MerchantServiceDashboard))
+	mux.Handle("GET /merchant/service/create", combinedMiddleware(app.MerchantServiceCreate))
+	mux.Handle("POST /merchant/service/create", combinedMiddleware(app.MerchantServiceCreatePost))
+	mux.Handle("GET /merchant/service/edit/{id}", combinedMiddleware(app.MerchantServiceEdit))
+	mux.Handle("POST /merchant/service/edit/{id}", combinedMiddleware(app.MerchantServiceEditPost))
 
 	log.Print("starting server on :4000")
 	err = http.ListenAndServe(":4000", mux)

@@ -22,13 +22,15 @@ import (
 )
 
 type Application struct {
-	TemplateCache map[string]*template.Template
-	DB            *sql.DB
-	Merchants     *models.MerchantModel
-	Products      *models.ProductModel
-	Sessions      *scs.SessionManager
-	Messages      *models.MessageModel
-	StoreViews    *models.StoreViewModel
+	TemplateCache     map[string]*template.Template
+	DB                *sql.DB
+	Merchants         *models.MerchantModel
+	Products          *models.ProductModel
+	Sessions          *scs.SessionManager
+	Messages          *models.MessageModel
+	StoreViews        *models.StoreViewModel
+	Services          *models.ServiceModel
+	ServiceCategories *models.ServiceCategoryModel
 }
 
 type templateData struct {
@@ -38,6 +40,9 @@ type templateData struct {
 	Merchants          []*models.Merchant // List of merchants
 	Products           []*models.Product
 	Product            *models.Product
+	Services           []*models.Service
+	Service            *models.Service
+	ServiceCategories  []*models.ServiceCategory
 	Error              string
 	MessagesList       []*models.Message
 	UnreadMessageCount int
@@ -509,131 +514,6 @@ func (app *Application) CategoryProducts(w http.ResponseWriter, r *http.Request)
 	w.Write([]byte("Products in category: " + category))
 }
 
-// MerchantRegister handler
-func (app *Application) MerchantRegister(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		app.render(w, r, http.StatusOK, "merchant.register.page.html", nil)
-		return
-	}
-
-	if r.Method == "POST" {
-		err := r.ParseForm()
-		if err != nil {
-			log.Printf("Error parsing form: %v", err)
-			http.Error(w, "Invalid form data", http.StatusBadRequest)
-			return
-		}
-
-		businessName := r.PostForm.Get("business-name")
-		email := r.PostForm.Get("email")
-		phone := r.PostForm.Get("phone")
-		businessType := r.PostForm.Get("business-type")
-		otherBusinessType := r.PostForm.Get("other-business-type") // New field
-		password := r.PostForm.Get("password")
-		passwordConfirm := r.PostForm.Get("password-confirm")
-
-		// If "other" is selected and a custom type is provided, use it
-		if businessType == "other" && otherBusinessType != "" {
-			businessType = otherBusinessType
-		}
-
-		// Validate required fields
-		if businessName == "" || email == "" || businessType == "" || password == "" {
-			if r.Header.Get("HX-Request") == "true" {
-				w.Write([]byte(`
-                    <div class="rounded-md bg-red-50 p-4 mt-4">
-                        <div class="flex">
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-red-800">Registration Failed</h3>
-                                <div class="mt-2 text-sm text-red-700">
-                                    <p>Please fill in all required fields.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `))
-				return
-			}
-			http.Error(w, "Please fill in all required fields", http.StatusBadRequest)
-			return
-		}
-
-		if password != passwordConfirm {
-			if r.Header.Get("HX-Request") == "true" {
-				w.Write([]byte(`
-                    <div class="rounded-md bg-red-50 p-4 mt-4">
-                        <div class="flex">
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-red-800">Registration Failed</h3>
-                                <div class="mt-2 text-sm text-red-700">
-                                    <p>Passwords do not match.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `))
-				return
-			}
-			http.Error(w, "Passwords do not match", http.StatusBadRequest)
-			return
-		}
-
-		// Insert the merchant with the resolved businessType and get the merchant ID
-		merchantID, err := app.Merchants.Insert(businessName, email, phone, businessType, password)
-		if err != nil {
-			log.Printf("Error registering merchant: %v", err)
-			if r.Header.Get("HX-Request") == "true" {
-				w.Write([]byte(`
-                    <div class="rounded-md bg-red-50 p-4 mt-4">
-                        <div class="flex">
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-red-800">Registration Failed</h3>
-                                <div class="mt-2 text-sm text-red-700">
-                                    <p>Error creating account. Please try again later.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `))
-				return
-			}
-			http.Error(w, "Error creating account", http.StatusInternalServerError)
-			return
-		}
-
-		// Create default vouchers for the new merchant using the merchant model's function
-		err = app.Merchants.InsertDefaultVouchers(merchantID, app.Products)
-		if err != nil {
-			log.Printf("Warning: Failed to create default vouchers for merchant %d: %v", merchantID, err)
-			// Continue with registration even if voucher creation fails
-		}
-
-		// After successful registration, authenticate the user
-		merchant, err := app.Merchants.Authenticate(email, password)
-		if err != nil {
-			log.Printf("Error authenticating new merchant: %v", err)
-			// Fall back to redirecting to login page if automatic login fails
-			if r.Header.Get("HX-Request") == "true" {
-				w.Header().Set("HX-Redirect", "/merchant/login")
-				return
-			}
-			http.Redirect(w, r, "/merchant/login", http.StatusSeeOther)
-			return
-		}
-
-		// Set the merchant ID in the session
-		app.Sessions.Put(r.Context(), "merchantID", merchant.ID)
-
-		// Redirect to the dashboard
-		if r.Header.Get("HX-Request") == "true" {
-			w.Header().Set("HX-Redirect", "/merchant/dashboard")
-			return
-		}
-
-		http.Redirect(w, r, "/merchant/dashboard", http.StatusSeeOther)
-	}
-}
-
 // MerchantLogin handler
 func (app *Application) MerchantLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
@@ -719,6 +599,16 @@ func (app *Application) MerchantDashboard(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
+	// Check business model and render appropriate dashboard
+	if merchant.BusinessModel == "service" {
+		// For service businesses, use the service dashboard
+		app.MerchantServiceDashboard(w, r)
+		return
+	}
+
+	// Continue with product dashboard - this is the default/original behavior
+
 	// Get merchant's products
 	products, err := app.Products.GetByMerchantID(merchantID)
 	if err != nil {
@@ -726,24 +616,26 @@ func (app *Application) MerchantDashboard(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
 	// Get total product count
 	totalProducts, err := app.Products.GetTotalCount(merchantID)
 	if err != nil {
 		log.Printf("Error getting product count: %v", err)
 		totalProducts = 0 // Fall back to 0 if there's an error
 	}
+
 	// Get unread message count
 	unreadCount, err := app.Messages.GetUnreadCount(merchantID)
 	if err != nil {
 		log.Printf("Error getting unread count: %v", err)
-		// Don't return error, just set count to 0
-		unreadCount = 0
+		unreadCount = 0 // Fall back to 0 if there's an error
 	}
+
 	// Get total views
 	totalViews, err := app.StoreViews.GetTotalViews(merchantID)
 	if err != nil {
 		log.Printf("Error getting view count: %v", err)
-		totalViews = 0
+		totalViews = 0 // Fall back to 0 if there's an error
 	}
 
 	data := &templateData{
@@ -830,6 +722,15 @@ func (app *Application) render(w http.ResponseWriter, r *http.Request, status in
 			if newData.Token != "" {
 				td.Token = newData.Token
 			}
+			if newData.ServiceCategories != nil {
+				td.ServiceCategories = newData.ServiceCategories
+			}
+			if newData.Services != nil {
+				td.Services = newData.Services
+			}
+			if newData.Service != nil {
+				td.Service = newData.Service
+			}
 			td.IsAuthenticated = td.IsAuthenticated || newData.IsAuthenticated
 		}
 	}
@@ -894,7 +795,6 @@ func createThumbnail(originalPath string) (string, error) {
 func (app *Application) StoreProfile(w http.ResponseWriter, r *http.Request) {
 	region := "ballarat" // Hardcoded for now
 	storeSlug := r.PathValue("slug")
-
 	log.Printf("Accessing store profile - Region: %s, Slug: %s", region, storeSlug)
 
 	if storeSlug == "" {
@@ -915,6 +815,21 @@ func (app *Application) StoreProfile(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	// EXTREME DEBUGGING FOR BUSINESS MODEL
+	log.Printf("-------- STORE DEBUGGING --------")
+	log.Printf("Store Name: %s", merchant.StoreName)
+	log.Printf("Business Model: '%s'", merchant.BusinessModel)
+	log.Printf("Business Model Type: %T", merchant.BusinessModel)
+	log.Printf("Business Model Bytes: %v", []byte(merchant.BusinessModel))
+	log.Printf("Is 'product': %v", merchant.BusinessModel == "product")
+	log.Printf("Is 'service': %v", merchant.BusinessModel == "service")
+	log.Printf("Is Equal Product: %v", strings.EqualFold(merchant.BusinessModel, "product"))
+	log.Printf("Is Equal Service: %v", strings.EqualFold(merchant.BusinessModel, "service"))
+	log.Printf("Contains Product: %v", strings.Contains(merchant.BusinessModel, "product"))
+	log.Printf("Contains Service: %v", strings.Contains(merchant.BusinessModel, "service"))
+	log.Printf("---------------------------------")
+
 	// Record the view
 	viewerIP := r.RemoteAddr
 	if forwardedFor := r.Header.Get("X-Forwarded-For"); forwardedFor != "" {
@@ -926,24 +841,54 @@ func (app *Application) StoreProfile(w http.ResponseWriter, r *http.Request) {
 		// Don't return error to user, continue showing the page
 	}
 
-	// Get all products for this merchant
-	products, err := app.Products.GetByMerchantID(merchant.ID)
-	if err != nil {
-		log.Printf("Error fetching products: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	// Prepare template data
+	// Prepare base template data
 	data := &templateData{
-		Store:    merchant,
-		Products: products,
+		Store: merchant,
 	}
 
-	// Render the store profile template
-	app.render(w, r, http.StatusOK, "store.page.html", data)
-}
+	// Try a different approach with string comparison
+	businessModel := strings.TrimSpace(merchant.BusinessModel)
+	if businessModel == "product" {
+		log.Printf("MATCHED PRODUCT: Using product template")
 
+		// Get products for this merchant
+		products, err := app.Products.GetByMerchantID(merchant.ID)
+		if err != nil {
+			log.Printf("Error fetching products: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		data.Products = products
+
+		app.render(w, r, http.StatusOK, "store.page.html", data)
+	} else if businessModel == "service" {
+		log.Printf("MATCHED SERVICE: Using service template")
+
+		// Get services for this merchant
+		services, err := app.Services.GetByMerchantID(merchant.ID)
+		if err != nil {
+			log.Printf("Error fetching services: %v", err)
+			services = []*models.Service{}
+		}
+		data.Services = services
+
+		app.render(w, r, http.StatusOK, "store.service.page.html", data)
+	} else {
+		// Fallback with explicit logging of what's happening
+		log.Printf("NO MATCH: Unknown business model '%s', defaulting to product template", businessModel)
+
+		// Default to product if neither matches
+		products, err := app.Products.GetByMerchantID(merchant.ID)
+		if err != nil {
+			log.Printf("Error fetching products: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		data.Products = products
+
+		app.render(w, r, http.StatusOK, "store.page.html", data)
+	}
+}
 func (app *Application) StoreSettings(w http.ResponseWriter, r *http.Request) {
 	// Get the merchant ID from the session
 	merchantID, ok := app.Sessions.Get(r.Context(), "merchantID").(int64)
@@ -1013,6 +958,7 @@ func (app *Application) StoreSettingsPost(w http.ResponseWriter, r *http.Request
 		StoreName:    r.PostForm.Get("store-name"),
 		Description:  r.PostForm.Get("description"),
 		Location:     r.PostForm.Get("location"),
+		Phone:        r.PostForm.Get("phone"), // Add phone field
 		OpeningHours: r.PostForm.Get("opening-hours"),
 	}
 
@@ -1276,26 +1222,6 @@ func (app *Application) MarkMessageAsRead(w http.ResponseWriter, r *http.Request
 	w.Write([]byte(html))
 }
 
-func (app *Application) Terms(w http.ResponseWriter, r *http.Request) {
-	app.render(w, r, http.StatusOK, "terms.page.html", nil)
-}
-
-// CheckBusinessType handles the HTMX request to show/hide the "Other" text field
-func (app *Application) CheckBusinessType(w http.ResponseWriter, r *http.Request) {
-	businessType := r.URL.Query().Get("business-type")
-	if businessType == "other" {
-		// Return the text field
-		fmt.Fprint(w, `
-			<div id="other-business-type-container" class="">
-				<label for="other-business-type" class="block text-sm font-medium text-gray-700">Please specify your business type</label>
-				<input type="text" name="other-business-type" id="other-business-type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
-			</div>
-		`)
-	} else {
-		// Return an empty hidden div
-		fmt.Fprint(w, `<div id="other-business-type-container" class="hidden"></div>`)
-	}
-}
 func (app *Application) Learn(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, http.StatusOK, "learn.page.html", nil)
 }

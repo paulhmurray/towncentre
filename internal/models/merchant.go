@@ -13,20 +13,21 @@ import (
 )
 
 type Merchant struct {
-	ID           int64
-	BusinessName string
-	StoreName    string
-	StoreSlug    string
-	LogoPath     string
-	Region       string
-	Description  string
-	Email        string
-	Phone        string
-	BusinessType string
-	Location     string
-	OpeningHours string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID            int64
+	BusinessName  string
+	StoreName     string
+	StoreSlug     string
+	LogoPath      string
+	Region        string
+	Description   string
+	Email         string
+	Phone         string
+	BusinessType  string
+	BusinessModel string
+	Location      string
+	OpeningHours  string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 // PasswordResetToken struct
@@ -44,7 +45,7 @@ type MerchantModel struct {
 }
 
 // Insert adds a new merchant to the database
-func (m *MerchantModel) Insert(businessName, email, phone, businessType, password string) (int64, error) {
+func (m *MerchantModel) Insert(businessName, email, phone, businessType, businessModel, password string) (int64, error) {
 	// Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
@@ -81,18 +82,19 @@ func (m *MerchantModel) Insert(businessName, email, phone, businessType, passwor
 	stmt := `
         INSERT INTO merchants (
             business_name, store_name, store_slug, region,
-            email, phone, business_type, password_hash,
+            email, phone, business_type, business_model, password_hash,
             created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`
 
 	result, err := m.DB.Exec(stmt,
-		businessName,   // business_name
-		businessName,   // store_name (same as business_name initially)
-		slug,           // store_slug
-		"ballarat",     // region (hardcoded for now)
-		email,          // email
-		phone,          // phone
-		businessType,   // business_type
+		businessName, // business_name
+		businessName, // store_name (same as business_name initially)
+		slug,         // store_slug
+		"ballarat",   // region (hardcoded for now)
+		email,        // email
+		phone,        // phone
+		businessType, // business_type
+		businessModel,
 		hashedPassword, // password_hash
 	)
 
@@ -168,7 +170,7 @@ func (m *MerchantModel) GetByID(id int64) (*Merchant, error) {
 
 	stmt := `
         SELECT id, business_name, store_name, store_slug, logo_path, region,
-               description, email, phone, business_type, location,
+               description, email, phone, business_type,business_model, location,
                opening_hours, created_at, updated_at 
         FROM merchants 
         WHERE id = ?`
@@ -184,6 +186,7 @@ func (m *MerchantModel) GetByID(id int64) (*Merchant, error) {
 		&merchant.Email,
 		&phone, // Changed from &merchant.Phone
 		&merchant.BusinessType,
+		&merchant.BusinessModel,
 		&location,     // Changed from &merchant.Location
 		&openingHours, // Changed from &merchant.OpeningHours
 		&merchant.CreatedAt,
@@ -243,7 +246,7 @@ func generateSlug(name string) string {
 func (m *MerchantModel) GetByStoreSlugAndRegion(slug, region string) (*Merchant, error) {
 	stmt := `
         SELECT id, business_name, store_name, store_slug, logo_path, region,
-               description, email, phone, business_type, location, 
+               description, email, phone, business_type,business_model, location, 
                opening_hours, created_at, updated_at
         FROM merchants
         WHERE store_slug = ? AND region = ?`
@@ -264,6 +267,7 @@ func (m *MerchantModel) GetByStoreSlugAndRegion(slug, region string) (*Merchant,
 		&merchant.Email,
 		&phone, // Changed from &merchant.Phone
 		&merchant.BusinessType,
+		&merchant.BusinessModel,
 		&location,     // Changed from &merchant.Location
 		&openingHours, // Changed from &merchant.OpeningHours
 		&merchant.CreatedAt,
@@ -297,19 +301,21 @@ func (m *MerchantModel) UpdateStoreInfo(merchant *Merchant) error {
 	// If logo path is provided, include it in the update
 	if merchant.LogoPath != "" {
 		stmt := `
-			UPDATE merchants 
-			SET store_name = ?,
-				description = ?,
-				location = ?,
-				opening_hours = ?,
-				logo_path = ?,
-				updated_at = NOW()
-			WHERE id = ?`
+            UPDATE merchants 
+            SET store_name = ?,
+                description = ?,
+                location = ?,
+                phone = ?,  -- Add phone field
+                opening_hours = ?,
+                logo_path = ?,
+                updated_at = NOW()
+            WHERE id = ?`
 
 		_, err := m.DB.Exec(stmt,
 			merchant.StoreName,
 			merchant.Description,
 			merchant.Location,
+			merchant.Phone, // Add phone field
 			merchant.OpeningHours,
 			merchant.LogoPath,
 			merchant.ID)
@@ -323,18 +329,20 @@ func (m *MerchantModel) UpdateStoreInfo(merchant *Merchant) error {
 
 	// If no logo path is provided, use the original query
 	stmt := `
-		UPDATE merchants 
-		SET store_name = ?,
-			description = ?,
-			location = ?,
-			opening_hours = ?,
-			updated_at = NOW()
-		WHERE id = ?`
+        UPDATE merchants 
+        SET store_name = ?,
+            description = ?,
+            location = ?,
+            phone = ?,  -- Add phone field
+            opening_hours = ?,
+            updated_at = NOW()
+        WHERE id = ?`
 
 	_, err := m.DB.Exec(stmt,
 		merchant.StoreName,
 		merchant.Description,
 		merchant.Location,
+		merchant.Phone, // Add phone field
 		merchant.OpeningHours,
 		merchant.ID)
 
@@ -344,7 +352,6 @@ func (m *MerchantModel) UpdateStoreInfo(merchant *Merchant) error {
 
 	return nil
 }
-
 func (m *MerchantModel) GetFeatured() ([]*Merchant, error) {
 	stmt := `
         SELECT id, business_name, store_name, store_slug, logo_path, region,
