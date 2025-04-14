@@ -193,7 +193,44 @@
             />
           </div>
         </div>
+  <!--  Stock management  -->
+            <div class="bg-gray-50 p-4 rounded-md">
+                <h3 class="text-lg font-medium text-gray-900 mb-3">Inventory Management</h3>
+                
+                <!-- NEW: Stock quantity field that shows current value -->
+                <div>
+                    <label for="stock_count" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
+                    <input type="number" name="stock_count" id="stock_count" min="0" required
+                        value="{{.Product.StockCount}}"
+              class="mt-1 block w-full pl-7 pr-3 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+              style="font-family: 'Inter', sans-serif;">
+                </div>
+                
+                <!-- NEW: Stock status dropdown with current selection -->
+                <div class="mt-4">
+                    <label for="stock_status" class="block text-sm font-medium text-gray-700">Stock Status</label>
+                    <select name="stock_status" id="stock_status" 
+            class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-base transition-all duration-300"
+            style="font-family: 'Inter', sans-serif;"
+          >
+                        <option value="In Stock" {{if eq .Product.StockStatus "In Stock"}}selected{{end}}>In Stock</option>
+                        <option value="Low Stock" {{if eq .Product.StockStatus "Low Stock"}}selected{{end}}>Low Stock</option>
+                        <option value="Out of Stock" {{if eq .Product.StockStatus "Out of Stock"}}selected{{end}}>Out of Stock</option>
+                    </select>
+                </div>
 
+                <!-- NEW: Visual indicator of current stock status with color coding -->
+                <div class="mt-3">
+                    <div class="flex items-center">
+                        <span class="inline-flex h-5 w-5 items-center justify-center rounded-full {{if eq .Product.StockStatus "Out of Stock"}}bg-red-100{{else if eq .Product.StockStatus "Low Stock"}}bg-yellow-100{{else}}bg-green-100{{end}}">
+                            <span class="h-2.5 w-2.5 rounded-full {{if eq .Product.StockStatus "Out of Stock"}}bg-red-600{{else if eq .Product.StockStatus "Low Stock"}}bg-yellow-600{{else}}bg-green-600{{end}}"></span>
+                        </span>
+                        <span class="ml-2 text-sm {{if eq .Product.StockStatus "Out of Stock"}}text-red-700{{else if eq .Product.StockStatus "Low Stock"}}text-yellow-700{{else}}text-green-700{{end}}">
+                            Current Status: {{.Product.StockStatus}}
+                        </span>
+                    </div>
+                </div>
+            </div>
         <!-- Category -->
         <div>
           <label
@@ -370,5 +407,18 @@
       reader.readAsDataURL(input.files[0]);
     }
   }
+ // Automatically update stock status when count changes
+    document.getElementById('stock_count').addEventListener('change', function() {
+        const count = parseInt(this.value, 10);
+        const statusField = document.getElementById('stock_status');
+        
+        if (count <= 0) {
+            statusField.value = 'Out of Stock';
+        } else if (count < 5) {
+            statusField.value = 'Low Stock';
+        } else {
+            statusField.value = 'In Stock';
+        }
+    });
 </script>
 {{end}}

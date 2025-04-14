@@ -396,11 +396,21 @@
                           {{.Description}}
                         </p>
                       </div>
-                      <div
-                        class="ml-4 flex-shrink-0 text-base font-semibold text-gray-900"
-                        style="font-family: &quot;Poppins&quot;, sans-serif"
-                      >
-                        ${{printf "%.2f" .Price}}
+                      <div class="ml-4 flex-shrink-0 flex flex-col items-end">
+                        <span
+                          class="text-base font-semibold text-gray-900"
+                          style="font-family: &quot;Poppins&quot;, sans-serif"
+                        >
+                          ${{printf "%.2f" .Price}}
+                        </span>
+                        
+                        <!-- Added: Stock Status Indicator -->
+                        <span class="mt-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                          {{if eq .StockStatus "Out of Stock"}}bg-red-100 text-red-800
+                          {{else if eq .StockStatus "Low Stock"}}bg-yellow-100 text-yellow-800
+                          {{else}}bg-green-100 text-green-800{{end}}">
+                          {{.StockCount}} in stock
+                        </span>
                       </div>
                     </div>
                   </div>

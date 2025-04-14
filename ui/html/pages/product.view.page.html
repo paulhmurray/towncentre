@@ -1,4 +1,5 @@
-{{define "title"}}{{.Product.Name}} - TownCentre{{end}} {{define "main"}}
+{{define "title"}}{{.Product.Name}} - TownCentre{{end}}
+{{define "main"}}
 <div class="relative min-h-screen bg-gray-50">
   <!-- Hero Background -->
   <div
@@ -10,7 +11,7 @@
     <!-- Breadcrumbs -->
     <div
       class="text-sm mb-6 flex items-center space-x-2 animate-fade-in-down"
-      style="font-family: &quot;Inter&quot;, sans-serif"
+      style="font-family: 'Inter', sans-serif"
     >
       <a
         href="/"
@@ -82,7 +83,7 @@
             <a
               href="/ballarat/{{.Store.StoreSlug}}"
               class="text-teal-600 hover:text-teal-700 text-sm font-medium transition-all duration-300"
-              style="font-family: &quot;Poppins&quot;, sans-serif"
+              style="font-family: 'Poppins', sans-serif"
             >
               {{.Store.StoreName}}
             </a>
@@ -91,7 +92,7 @@
           <!-- Product Details -->
           <h1
             class="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 animate-fade-in-down"
-            style="font-family: &quot;Poppins&quot;, sans-serif"
+            style="font-family: 'Poppins', sans-serif"
           >
             {{.Product.Name}}
           </h1>
@@ -100,25 +101,54 @@
             <h2 class="sr-only">Product information</h2>
             <p
               class="text-2xl sm:text-3xl tracking-tight text-gray-900"
-              style="font-family: &quot;Inter&quot;, sans-serif"
+              style="font-family: 'Inter', sans-serif"
             >
               ${{printf "%.2f" .Product.Price}}
             </p>
           </div>
 
+          <!-- Stock Status -->
+          <div class="mt-2 flex items-center">
+            <span class="inline-flex h-2.5 w-2.5 rounded-full 
+              {{if eq .Product.StockStatus "Out of Stock"}}
+                bg-red-600
+              {{else if eq .Product.StockStatus "Low Stock"}}
+                bg-yellow-600
+              {{else}}
+                bg-green-600
+              {{end}}"
+            ></span>
+            <span class="ml-1.5 text-sm text-gray-600 
+              {{if eq .Product.StockStatus "Out of Stock"}}
+                text-red-700
+              {{else if eq .Product.StockStatus "Low Stock"}}
+                text-yellow-700
+              {{else}}
+                text-green-700
+              {{end}}"
+              style="font-family: 'Inter', sans-serif"
+            >
+              {{.Product.StockStatus}}
+              {{if and (ne .Product.StockStatus "Out of Stock") (gt .Product.StockCount 0)}}
+                <span class="ml-1 text-gray-500">— {{.Product.StockCount}} available</span>
+              {{end}}
+            </span>
+          </div>
+
           <!-- Delivery/Pickup Badges -->
-          <div class="mt-8 flex items-center space-x-3">
+          <div class="mt-6 flex items-center space-x-3">
             {{if .Product.HasDelivery}}
             <span
               class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-800"
-              style="font-family: &quot;Inter&quot;, sans-serif"
+              style="font-family: 'Inter', sans-serif"
             >
               Delivery Available
             </span>
-            {{end}} {{if .Product.HasPickup}}
+            {{end}}
+            {{if .Product.HasPickup}}
             <span
               class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
-              style="font-family: &quot;Inter&quot;, sans-serif"
+              style="font-family: 'Inter', sans-serif"
             >
               Pickup Available
             </span>
@@ -129,7 +159,7 @@
           <div class="mt-6">
             <span
               class="text-sm text-gray-600"
-              style="font-family: &quot;Inter&quot;, sans-serif"
+              style="font-family: 'Inter', sans-serif"
             >
               Category: {{.Product.Category}}
             </span>
@@ -140,7 +170,7 @@
             <h3 class="sr-only">Description</h3>
             <div
               class="space-y-4 text-base text-gray-700"
-              style="font-family: &quot;Inter&quot;, sans-serif"
+              style="font-family: 'Inter', sans-serif"
             >
               {{.Product.Description}}
             </div>
@@ -150,7 +180,7 @@
           <div class="mt-10 border-t border-gray-200 pt-8">
             <h3
               class="text-lg font-medium text-gray-900"
-              style="font-family: &quot;Poppins&quot;, sans-serif"
+              style="font-family: 'Poppins', sans-serif"
             >
               Store Information
             </h3>
@@ -178,12 +208,13 @@
                 </svg>
                 <p
                   class="ml-2 text-sm text-gray-600"
-                  style="font-family: &quot;Inter&quot;, sans-serif"
+                  style="font-family: 'Inter', sans-serif"
                 >
                   {{.Store.Location}}
                 </p>
               </div>
-              {{end}} {{if .Store.OpeningHours}}
+              {{end}}
+              {{if .Store.OpeningHours}}
               <div class="flex items-start">
                 <svg
                   class="h-5 w-5 text-teal-500"
@@ -200,7 +231,7 @@
                 </svg>
                 <p
                   class="ml-2 text-sm text-gray-600"
-                  style="font-family: &quot;Inter&quot;, sans-serif"
+                  style="font-family: 'Inter', sans-serif"
                 >
                   {{.Store.OpeningHours}}
                 </p>
@@ -223,7 +254,7 @@
                 <a
                   href="/ballarat/{{.Store.StoreSlug}}"
                   class="ml-2 text-sm text-teal-600 hover:text-teal-700 transition-all duration-300"
-                  style="font-family: &quot;Inter&quot;, sans-serif"
+                  style="font-family: 'Inter', sans-serif"
                 >
                   Visit Store Page
                 </a>
@@ -237,7 +268,7 @@
             <a
               href="mailto:{{.Store.Email}}?subject=Enquiry about {{.Product.Name}}"
               class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
-              style="font-family: &quot;Inter&quot;, sans-serif"
+              style="font-family: 'Inter', sans-serif"
             >
               Contact Store
             </a>

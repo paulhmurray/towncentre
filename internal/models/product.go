@@ -20,6 +20,8 @@ type Product struct {
 	HasPickup     bool
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
+	StockCount    int
+	StockStatus   string
 	BusinessName  string // For displaying the store name with the product
 	Location      string // For displaying the store location
 }
@@ -30,13 +32,13 @@ type ProductModel struct {
 
 func (m *ProductModel) Insert(p *Product) error {
 	log.Printf("ProductModel.Insert called for product: %s", p.Name)
-	
+
 	stmt := `
         INSERT INTO products (
             merchant_id, name, description, price, category, 
-            image_path, thumbnail_path, has_delivery, has_pickup, 
+            image_path, thumbnail_path, has_delivery, has_pickup, stock_count, stock_status,
             created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`
 
 	var imagePath, thumbnailPath *string
 	if p.ImagePath != nil {
@@ -51,14 +53,18 @@ func (m *ProductModel) Insert(p *Product) error {
 	} else {
 		log.Printf("No thumbnail path provided")
 	}
-	
+
 	log.Printf("Executing SQL with parameters - MerchantID: %d, Name: %s, Category: %s, ImagePath: %v, ThumbnailPath: %v",
 		p.MerchantID, p.Name, p.Category, imagePath, thumbnailPath)
-	
+	// Set default stock status based on stock count if not provided
+	if p.StockStatus == "" {
+		p.StockStatus = getStockStatus(p.StockCount)
+	}
+
 	result, err := m.DB.Exec(stmt,
 		p.MerchantID, p.Name, p.Description, p.Price,
 		p.Category, imagePath, thumbnailPath,
-		p.HasDelivery, p.HasPickup)
+		p.HasDelivery, p.HasPickup, p.StockCount, p.StockStatus)
 	if err != nil {
 		log.Printf("Error executing SQL: %v", err)
 		return err
@@ -107,7 +113,7 @@ func (m *ProductModel) Update(p *Product) error {
         UPDATE products 
         SET name = ?, description = ?, price = ?, category = ?, 
             image_path = ?, thumbnail_path = ?, 
-            has_delivery = ?, has_pickup = ?, 
+            has_delivery = ?, has_pickup = ?, stock_count = ?, stock_status = ?, 
             updated_at = NOW() 
         WHERE id = ? AND merchant_id = ?`
 
@@ -118,11 +124,14 @@ func (m *ProductModel) Update(p *Product) error {
 	if p.ThumbnailPath != nil {
 		thumbnailPath = p.ThumbnailPath
 	}
-
+	// Set default stock status based on stock count if not provided
+	if p.StockStatus == "" {
+		p.StockStatus = getStockStatus(p.StockCount)
+	}
 	_, err := m.DB.Exec(stmt,
 		p.Name, p.Description, p.Price, p.Category,
 		imagePath, thumbnailPath,
-		p.HasDelivery, p.HasPickup,
+		p.HasDelivery, p.HasPickup, p.StockCount, p.StockStatus,
 		p.ID, p.MerchantID)
 
 	return err
@@ -140,7 +149,7 @@ func (m *ProductModel) GetByID(productID int64, merchantID int64) (*Product, err
 		stmt = `
             SELECT id, merchant_id, name, description, price, 
                    category, image_path, thumbnail_path,
-                   has_delivery, has_pickup, created_at, updated_at
+                   has_delivery, has_pickup, stock_count, stock_status, created_at, updated_at
             FROM products 
             WHERE id = ? AND merchant_id = ?`
 		args = []interface{}{productID, merchantID}
@@ -149,7 +158,7 @@ func (m *ProductModel) GetByID(productID int64, merchantID int64) (*Product, err
 		stmt = `
             SELECT id, merchant_id, name, description, price, 
                    category, image_path, thumbnail_path,
-                   has_delivery, has_pickup, created_at, updated_at
+                   has_delivery, has_pickup, stock_count, stock_status, created_at, updated_at
             FROM products 
             WHERE id = ?`
 		args = []interface{}{productID}
@@ -165,10 +174,12 @@ func (m *ProductModel) GetByID(productID int64, merchantID int64) (*Product, err
 		&p.Description,
 		&p.Price,
 		&p.Category,
-		&imagePath,
-		&thumbnailPath,
+		&imagePath,     // Changed from &p.StockCount
+		&thumbnailPath, // Changed from &p.StockStatus
 		&p.HasDelivery,
 		&p.HasPickup,
+		&p.StockCount,  // Moved to match SQL query order
+		&p.StockStatus, // Moved to match SQL query order
 		&p.CreatedAt,
 		&p.UpdatedAt,
 	)
@@ -197,7 +208,8 @@ func (m *ProductModel) GetByMerchantID(merchantID int64) ([]*Product, error) {
 	stmt := `
         SELECT id, merchant_id, name, description, price, 
                category, image_path, thumbnail_path,
-               has_delivery, has_pickup, created_at, updated_at
+               has_delivery, has_pickup, stock_count, stock_status,
+               created_at, updated_at
         FROM products 
         WHERE merchant_id = ?
         ORDER BY created_at DESC`
@@ -223,6 +235,8 @@ func (m *ProductModel) GetByMerchantID(merchantID int64) ([]*Product, error) {
 			&thumbnailPath,
 			&p.HasDelivery,
 			&p.HasPickup,
+			&p.StockCount,  // New stock field
+			&p.StockStatus, // New stock field
 			&p.CreatedAt,
 			&p.UpdatedAt,
 		)
@@ -247,10 +261,12 @@ func (m *ProductModel) GetFeatured() ([]*Product, error) {
 	stmt := `
         SELECT p.id, p.merchant_id, p.name, p.description, p.price, 
                p.category, p.image_path, p.thumbnail_path,
-               p.has_delivery, p.has_pickup, p.created_at, p.updated_at,
+               p.has_delivery, p.has_pickup, p.stock_count, p.stock_status,
+               p.created_at, p.updated_at,
                m.business_name, m.location
         FROM products p
         JOIN merchants m ON p.merchant_id = m.id
+        WHERE p.stock_count > 0
         ORDER BY p.created_at DESC
         LIMIT 8`
 
@@ -269,7 +285,8 @@ func (m *ProductModel) GetFeatured() ([]*Product, error) {
 		err := rows.Scan(
 			&p.ID, &p.MerchantID, &p.Name, &p.Description, &p.Price,
 			&p.Category, &imagePath, &thumbnailPath,
-			&p.HasDelivery, &p.HasPickup, &p.CreatedAt, &p.UpdatedAt,
+			&p.HasDelivery, &p.HasPickup, &p.StockCount, &p.StockStatus,
+			&p.CreatedAt, &p.UpdatedAt,
 			&businessName, &location,
 		)
 		if err != nil {
@@ -308,4 +325,96 @@ func (m *ProductModel) GetTotalCount(merchantID int64) (int, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+// UpdateStock updates just the stock information for a product
+func (m *ProductModel) UpdateStock(productID, merchantID int64, stockCount int) error {
+	// Calculate stock status based on count
+	stockStatus := getStockStatus(stockCount)
+
+	stmt := `
+        UPDATE products 
+        SET stock_count = ?, stock_status = ?, updated_at = NOW() 
+        WHERE id = ? AND merchant_id = ?`
+
+	result, err := m.DB.Exec(stmt, stockCount, stockStatus, productID, merchantID)
+	if err != nil {
+		return err
+	}
+
+	// Check if the product exists and belongs to the merchant
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no product found with ID %d for this merchant", productID)
+	}
+
+	return nil
+}
+
+// Helper function to determine stock status based on count
+func getStockStatus(count int) string {
+	if count <= 0 {
+		return "Out of Stock"
+	} else if count < 5 {
+		return "Low Stock"
+	} else {
+		return "In Stock"
+	}
+}
+
+// GetLowStockProducts gets products with low or out of stock status
+func (m *ProductModel) GetLowStockProducts(merchantID int64) ([]*Product, error) {
+	stmt := `
+        SELECT id, merchant_id, name, description, price, 
+               category, image_path, thumbnail_path,
+               has_delivery, has_pickup, stock_count, stock_status,
+               created_at, updated_at
+        FROM products 
+        WHERE merchant_id = ? AND (stock_count < 5)
+        ORDER BY stock_count ASC`
+
+	rows, err := m.DB.Query(stmt, merchantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var products []*Product
+	for rows.Next() {
+		p := &Product{}
+		var imagePath, thumbnailPath sql.NullString
+		err := rows.Scan(
+			&p.ID,
+			&p.MerchantID,
+			&p.Name,
+			&p.Description,
+			&p.Price,
+			&p.Category,
+			&imagePath,
+			&thumbnailPath,
+			&p.HasDelivery,
+			&p.HasPickup,
+			&p.StockCount,
+			&p.StockStatus,
+			&p.CreatedAt,
+			&p.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		// Convert sql.NullString to *string
+		if imagePath.Valid {
+			p.ImagePath = &imagePath.String
+		}
+		if thumbnailPath.Valid {
+			p.ThumbnailPath = &thumbnailPath.String
+		}
+		products = append(products, p)
+	}
+
+	return products, nil
 }

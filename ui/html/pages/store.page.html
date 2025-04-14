@@ -487,7 +487,20 @@
                   ${{printf "%.2f" .Price}}
                 </span>
               </div>
-
+              <div class="flex items-center mt-1">
+                <span class="inline-flex h-2.5 w-2.5 rounded-full
+                  {{if eq .StockStatus "Out of Stock"}}bg-red-600
+                  {{else if eq .StockStatus "Low Stock"}}bg-yellow-600
+                  {{else}}bg-green-600{{end}}">
+                </span>
+                <span class="ml-1.5 text-xs p-2 
+                  {{if eq .StockStatus "Out of Stock"}}text-red-700
+                  {{else if eq .StockStatus "Low Stock"}}text-yellow-700
+                  {{else}}text-green-700{{end}}"
+                  style="font-family: &quot;Inter&quot;, sans-serif">
+                  {{.StockStatus}}
+                </span>
+              </div>
               <p
                 class="mt-1 sm:mt-2 text-gray-600 line-clamp-2 text-sm"
                 style="font-family: &quot;Inter&quot;, sans-serif"

@@ -11,7 +11,12 @@ CREATE TABLE IF NOT EXISTS merchants (
     phone VARCHAR(50),
     business_type VARCHAR(50) NOT NULL,
     business_model ENUM('product', 'service', 'hybrid') NOT NULL DEFAULT 'product',
+    business_type_detail VARCHAR(100),
     location VARCHAR(255),
+    service_areas TEXT,
+    qualifications TEXT,
+    years_experience INT,
+    license_info VARCHAR(255),
     opening_hours TEXT,
     password_hash BINARY(60) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -40,11 +45,15 @@ CREATE TABLE IF NOT EXISTS products (
     thumbnail_path VARCHAR(255),
     has_delivery BOOLEAN DEFAULT false,
     has_pickup BOOLEAN DEFAULT false,
+    stock_count INT NOT NULL DEFAULT 0,
+    stock_status VARCHAR(50) NOT NULL DEFAULT 'Out of Stock',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (merchant_id) REFERENCES merchants(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Add an index for faster stock status lookups
+CREATE INDEX IF NOT EXISTS idx_product_stock_status ON products(merchant_id, stock_status);
 
 CREATE TABLE IF NOT EXISTS messages (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -59,6 +68,7 @@ CREATE TABLE IF NOT EXISTS messages (
     FOREIGN KEY (merchant_id) REFERENCES merchants(id),
     CHECK (LENGTH(message) <= 1000) -- Limit message length
 );
+
 CREATE TABLE IF NOT EXISTS store_views (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     merchant_id BIGINT UNSIGNED NOT NULL,
@@ -66,6 +76,7 @@ CREATE TABLE IF NOT EXISTS store_views (
     viewer_ip VARCHAR(45),  -- IPv6 addresses can be up to 45 chars
     FOREIGN KEY (merchant_id) REFERENCES merchants(id)
 );
+
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     merchant_id BIGINT UNSIGNED NOT NULL,
@@ -119,10 +130,8 @@ INSERT INTO service_categories (name, slug, icon, display_order) VALUES
 ('Legal', 'legal', 'scale', 90),
 ('Automotive', 'automotive', 'car', 100);
 
--- Modify merchants table to support service businesses
-ALTER TABLE merchants 
-ADD COLUMN business_type_detail VARCHAR(100) AFTER business_type,
-ADD COLUMN service_areas TEXT AFTER location,
-ADD COLUMN qualifications TEXT AFTER service_areas,
-ADD COLUMN years_experience INT AFTER qualifications,
-ADD COLUMN license_info VARCHAR(255) AFTER years_experience;
+-- Update existing products to have a default stock of 10 and status of "In Stock"
+UPDATE products 
+SET stock_count = 1,
+    stock_status = 'In Stock'
+WHERE stock_count = 0;

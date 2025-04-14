@@ -198,6 +198,24 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 		http.Error(w, "Invalid price", http.StatusBadRequest)
 		return
 	}
+	// Parse stock count
+	stockCount, err := strconv.Atoi(r.PostForm.Get("stock_count"))
+	if err != nil || stockCount < 0 {
+		stockCount = 0 // Default to 0 if invalid
+	}
+
+	// Get stock status
+	stockStatus := r.PostForm.Get("stock_status")
+	if stockStatus == "" {
+		// Determine stock status based on count if not provided
+		if stockCount <= 0 {
+			stockStatus = "Out of Stock"
+		} else if stockCount < 5 {
+			stockStatus = "Low Stock"
+		} else {
+			stockStatus = "In Stock"
+		}
+	}
 
 	// Create product struct early
 	product := &models.Product{
@@ -208,6 +226,8 @@ func (app *Application) MerchantProductCreatePost(w http.ResponseWriter, r *http
 		Category:    r.PostForm.Get("category"),
 		HasDelivery: r.PostForm.Get("delivery") == "on",
 		HasPickup:   r.PostForm.Get("pickup") == "on",
+		StockCount:  stockCount,
+		StockStatus: stockStatus,
 	}
 
 	// Handle file upload
@@ -385,6 +405,24 @@ func (app *Application) MerchantProductEditPost(w http.ResponseWriter, r *http.R
 		http.Error(w, "Invalid price", http.StatusBadRequest)
 		return
 	}
+	// Parse stock count - new code
+	stockCount, err := strconv.Atoi(r.PostForm.Get("stock_count"))
+	if err != nil || stockCount < 0 {
+		stockCount = 0 // Default to 0 if invalid
+	}
+
+	// Get stock status - new code
+	stockStatus := r.PostForm.Get("stock_status")
+	if stockStatus == "" {
+		// Determine stock status based on count if not provided
+		if stockCount <= 0 {
+			stockStatus = "Out of Stock"
+		} else if stockCount < 5 {
+			stockStatus = "Low Stock"
+		} else {
+			stockStatus = "In Stock"
+		}
+	}
 
 	// First get the existing product
 	existingProduct, err := app.Products.GetByID(productID, merchantID)
@@ -404,6 +442,8 @@ func (app *Application) MerchantProductEditPost(w http.ResponseWriter, r *http.R
 		Category:      r.PostForm.Get("category"),
 		HasDelivery:   r.PostForm.Get("delivery") == "on",
 		HasPickup:     r.PostForm.Get("pickup") == "on",
+		StockCount:    stockCount,
+		StockStatus:   stockStatus,
 		ImagePath:     existingProduct.ImagePath,     // Keep existing image path
 		ThumbnailPath: existingProduct.ThumbnailPath, // Keep existing thumbnail path
 	}

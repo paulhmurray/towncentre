@@ -183,6 +183,9 @@ func main() {
 	mux.Handle("GET /merchant/service/edit/{id}", combinedMiddleware(app.MerchantServiceEdit))
 	mux.Handle("POST /merchant/service/edit/{id}", combinedMiddleware(app.MerchantServiceEditPost))
 
+	//Stock
+	mux.Handle("POST /merchant/product/stock/{id}", combinedMiddleware(app.QuickStockUpdate))
+
 	log.Print("starting server on :4000")
 	err = http.ListenAndServe(":4000", mux)
 	log.Fatal(err)
